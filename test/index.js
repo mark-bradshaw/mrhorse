@@ -1,6 +1,7 @@
 var Code = require('code');
 var Lab = require('lab');
 var lab = exports.lab = Lab.script();
+var fs = require('fs');
 
 var mrhorse = require('..');
 
@@ -33,6 +34,20 @@ lab.test('exists', function(done) {
 lab.test('requires a policy directory', function(done) {
     mrhorse.setup(server, {}, function(err) {
         Code.expect(err.toString()).to.equal('Error: policyDirectory is required for MrHorse.');
+        done();
+    });
+});
+
+lab.test('ignores an empty policy directory', function(done) {
+    try {
+        fs.mkdirSync(__dirname + '/emptypolicies');
+    } catch (err) {}
+    mrhorse.setup(server, {
+        policyDirectory: __dirname + '/emptypolicies'
+    }, function(err) {
+        Code.expect(server.app.policies).to.be.an.object();
+        Code.expect(server.app.policies.names.length).to.equal(0);
+        fs.rmdirSync(__dirname + '/emptypolicies');
         done();
     });
 });
