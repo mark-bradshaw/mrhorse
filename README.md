@@ -6,7 +6,7 @@ Lead Maintainer: [Mark Bradshaw](https://github.com/mark-bradshaw)
 
 ### Policies
 
-[MrHorse](https://github.com/mark-bradshaw/mrhorse) is useful for applying policies to routes in hapi.  NOTE: this is currently setup for Hapi 7.  Hapi 8 compatibility is coming.
+[MrHorse](https://github.com/mark-bradshaw/mrhorse) is useful for applying policies (characteristics) to routes in hapi.
 
 Policies can be used for authentication, authorization, reply modification and shaping, or logging.  You may create policies such as `isLoggedIn`, `hasAccessToWidget`, `addTracking`, or `logForAnalytics`.  Policies can be applied as either a pre-handler, before the request is processed, or a post-handler, after a reply has been created.
 
@@ -25,21 +25,19 @@ Once you have created your policies folder you must setup *mrhorse*.  In your pl
 ```
 var mrhorse = require('mrhorse');
 
-exports.register = function(plugin, options, next) {
-  mrhorse.setup(plugin, {
-        policyDirectory: __dirname + '/policies'
-    }, function(err) {
-        if (err) {
-            return next(err);
-        }
-    });
-};
+mrhorse.setup(server, {
+      policyDirectory: __dirname + '/policies'
+  }, function(err) {
+      if (err) {
+          return console.log(err);
+      }
+  });
 ```
 
 Now create a policy inside the `policies` folder.  This is just a simple javascript file that exports one function.  The name of the file should be the same as the function name.  For this example you would name the file `isAdmin.js`.
 
 ```
-var isAdmin = function(request, callback) {
+var isAdmin = function(request, reply, callback) {
    var role = _do_something_to_check_user_role(request);
    if (role && (role === 'admin')) {
        return callback(null, true);
@@ -68,7 +66,7 @@ var routes = [
        config: {
            handler: your_route_handler,
            plugins: {
-               policy: ['isAdmin']
+               policies: ['isAdmin']
            }
        }
    }
