@@ -1,0 +1,8 @@
+{
+  "debug": true,
+  "node": true,
+  "newcap": true,
+  "eqeqeq": true,
+  "bitwise": true,
+  "latedef": true
+}
