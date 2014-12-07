@@ -1,6 +1,6 @@
 ## MrHorse
 
-[**hapi**](https://github.com/hapijs/hapi) Policies for routes.  
+[**hapi**](https://github.com/hapijs/hapi) policies for routes.
 
 Lead Maintainer: [Mark Bradshaw](https://github.com/mark-bradshaw)
 
@@ -10,9 +10,10 @@ Lead Maintainer: [Mark Bradshaw](https://github.com/mark-bradshaw)
 
 ### Usage
 
-To install *mrhorse*:
+To install mrhorse:
 
-```npm install mrhorse --save
+```
+npm install mrhorse --save
 ```
 
 *Mrhorse* looks for policies in a folder you create.  I recommend calling it `policies`.  You can have this folder site anywhere in your hapi folder structure.  If you are using plugins for different site functionality, each plugin can have its own separate policies folder.
