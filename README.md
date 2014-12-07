@@ -1,6 +1,6 @@
 ## MrHorse
 
-[**hapi**](https://github.com/hapijs/hapi) policies for routes.
+Policies for [**hapi**](https://github.com/hapijs/hapi) routes.
 
 Lead Maintainer: [Mark Bradshaw](https://github.com/mark-bradshaw)
 
