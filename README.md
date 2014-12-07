@@ -6,7 +6,9 @@ Lead Maintainer: [Mark Bradshaw](https://github.com/mark-bradshaw)
 
 ### Policies
 
-[MrHorse](https://github.com/mark-bradshaw/mrhorse) is useful for applying policies to routes in hapi.  Policies can be used for authentication, authorization, reply modification and shaping, or logging.  You may create policies such as `isLoggedIn`, `hasAccessToWidget`, `addTracking`, or `logForAnalytics`.  Policies can be applied as either a pre-handler, before the request is processed, or a post-handler, after a reply has been created.
+[MrHorse](https://github.com/mark-bradshaw/mrhorse) is useful for applying policies to routes in hapi.  NOTE: this is currently setup for Hapi 7.  Hapi 8 compatibility is coming.  
+
+Policies can be used for authentication, authorization, reply modification and shaping, or logging.  You may create policies such as `isLoggedIn`, `hasAccessToWidget`, `addTracking`, or `logForAnalytics`.  Policies can be applied as either a pre-handler, before the request is processed, or a post-handler, after a reply has been created.
 
 ### Usage
 
@@ -52,10 +54,9 @@ isAdmin.post = false;
 module.exports = isAdmin;
 ```
 
-The function must call the callback and provide a boolean value on whether the request should continue on for further processing.  If you callback with false hapi will be sent back a forbidden error.  Alternately you can provide your own custom error object.  By default you will be a 403 forbidden error.  If your policy has nothing to do with authentication or authorization, you will probably just want to always respond back with true to continue normal processing of the request.
+The function must call the callback and provide a boolean value indicating whether the request can continue on for further processing.  If you callback with `false` hapi will be sent a forbidden error to reply with.  Alternately you can provide your own custom error object.  By default you will be a 403 forbidden error if you don't provide an alternative error.  If your policy has nothing to do with authentication or authorization, you will probably just want to always respond back with true to continue normal processing of the request.
 
 You can specify whether this policy should run as a pre-handler, a post-handler, or (in a more exotic scenario) both, by adding the `pre` and `post` objects to the function as seen above.  You don't have to add these if you don't want to.  By default all policies are assumed to be pre-handlers only.
-
 
 Now that you've created your policy, apply it to whatever routes you want.
 
