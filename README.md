@@ -6,7 +6,7 @@ Lead Maintainer: [Mark Bradshaw](https://github.com/mark-bradshaw)
 
 ### Policies
 
-[MrHorse](https://github.com/mark-bradshaw/mrhorse) is useful for applying policies to routes in hapi.  NOTE: this is currently setup for Hapi 7.  Hapi 8 compatibility is coming.  
+[MrHorse](https://github.com/mark-bradshaw/mrhorse) is useful for applying policies to routes in hapi.  NOTE: this is currently setup for Hapi 7.  Hapi 8 compatibility is coming.
 
 Policies can be used for authentication, authorization, reply modification and shaping, or logging.  You may create policies such as `isLoggedIn`, `hasAccessToWidget`, `addTracking`, or `logForAnalytics`.  Policies can be applied as either a pre-handler, before the request is processed, or a post-handler, after a reply has been created.
 
@@ -74,3 +74,5 @@ var routes = [
    }
 ];
 ```
+
+Using policies you can easily mix and match your business logic into your routes in a declarative manner.  This makes it much easier to see what is being done on each route, and allows you to centralize your authentication, authorization, or logging in one place.
