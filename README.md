@@ -20,7 +20,8 @@ npm install mrhorse --save
 
 Once you have created your policies folder you must setup *mrhorse*.  In your plugin's index.js, where you have the `register` function:
 
-```var mrhorse = require('mrhorse');
+```
+var mrhorse = require('mrhorse');
 
 exports.register = function(plugin, options, next) {
   mrhorse.setup(plugin, {
@@ -35,7 +36,8 @@ exports.register = function(plugin, options, next) {
 
 Now create a policy inside the `policies` folder.  This is just a simple javascript file that exports one function.  The name of the file should be the same as the function name.  For this example you would name the file `isAdmin.js`.
 
-```var isAdmin = function(request, callback) {
+```
+var isAdmin = function(request, callback) {
    var role = _do_something_to_check_user_role(request);
    if (role && (role === 'admin')) {
        return callback(null, true);
