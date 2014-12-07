@@ -3,7 +3,9 @@
     "version": "0.0.2",
     "description": "Apply policies to hapi routes",
     "main": "index",
-    "scripts": {},
+    "scripts": {
+        "test": "node_modules/lab/bin/lab -vvc"
+    },
     "repository": {
         "type": "git",
         "url": "git@github.com:mark-bradshaw/mrhorse.git"
@@ -24,7 +26,8 @@
         "lodash": "^2.4.1"
     },
     "devDependencies": {
+        "code": "^1.2.1",
         "hapi": "^8.0.0",
-        "lab": "^4.3.0"
+        "lab": "^5.1.0"
     }
 }
