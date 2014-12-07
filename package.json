@@ -1,7 +1,7 @@
 {
     "name": "mrhorse",
-    "version": "0.0.1",
-    "description": "Apply policies to hapi requests",
+    "version": "0.0.2",
+    "description": "Apply policies to hapi routes",
     "main": "index",
     "scripts": {},
     "repository": {
@@ -21,10 +21,10 @@
     "dependencies": {
         "async": "^0.9.0",
         "hoek": "^2.5.0",
-        "lodash": "^2.4.1",
-        "path": "^0.4.9"
+        "lodash": "^2.4.1"
     },
     "devDependencies": {
+        "hapi": "^8.0.0",
         "lab": "^4.3.0"
     }
 }
