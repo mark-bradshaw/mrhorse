@@ -26,7 +26,7 @@ To install mrhorse:
 npm install mark-bradshaw/mrhorse --save
 ```
 
-*Mrhorse* looks for policies in a folder you create.  I recommend calling it `policies`, but you can choose whatever you want.  You can have this folder site anywhere in your hapi folder structure.  If you are using plugins for different site functionality, each plugin can have its own separate policies folder.
+*Mrhorse* looks for policies in a folder you create.  I recommend calling it `policies`, but you can choose whatever you want.  You can have this folder sit anywhere in your hapi folder structure.  If you are using plugins for different site functionality, each plugin can have its own separate policies folder.
 
 Once you have created your policies folder you must setup mrhorse.  You can setup mrhorse in as many places as you want.  It's ok to have multiple policies folders in different locations, and setup mrhorse in each one.  The only requirement is that each policy name must be globally unique.  To setup mrhorse call it with the server object, an options object with the location of the policyDirectory, and a callback.
 
