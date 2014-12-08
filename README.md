@@ -8,7 +8,7 @@ Lead Maintainer: [Mark Bradshaw](https://github.com/mark-bradshaw)
 
 [![Build Status](https://travis-ci.org/mark-bradshaw/mrhorse.svg?branch=master)](https://travis-ci.org/mark-bradshaw/mrhorse)
 
-### Policies
+### Why
 
 [MrHorse](https://github.com/mark-bradshaw/mrhorse) is useful for applying policies to routes in hapi.  Policies are a good fit whenever you find yourself repeating code in your handlers.  Policies can be used for authentication, authorization, reply modification and shaping, or logging.  You might have policies like `isLoggedIn`, `hasAccessToWidget`, `addTracking`, or `logForAnalytics`.  Policies can be applied as either a pre-handler, before the request is processed, or a post-handler, after a response has been created, or both.
 
