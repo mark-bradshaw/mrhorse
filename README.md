@@ -1,6 +1,6 @@
 ## MrHorse
 
-"No sir, I didn't like it."
+"No sir, I don't like it."
 
 Policies for [**hapi**](https://github.com/hapijs/hapi) routes.
 
