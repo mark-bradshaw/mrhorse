@@ -69,6 +69,14 @@ lab.experiment('Normal setup', function(done) {
 
         server.route({
             method: 'GET',
+            path: '/none',
+            handler: function(request, reply) {
+                reply('none');
+            }
+        });
+
+        server.route({
+            method: 'GET',
             path: '/ok',
             handler: function(request, reply) {
                 reply('ok');
@@ -95,13 +103,26 @@ lab.experiment('Normal setup', function(done) {
 
         server.route({
             method: 'GET',
-            path: '/customfail',
+            path: '/custommessage',
             handler: function(request, reply) {
                 reply('ok');
             },
             config: {
                 plugins: {
-                    policies: ['customFail']
+                    policies: ['customMessage']
+                }
+            }
+        });
+
+        server.route({
+            method: 'GET',
+            path: '/customerror',
+            handler: function(request, reply) {
+                reply('ok');
+            },
+            config: {
+                plugins: {
+                    policies: ['customError']
                 }
             }
         });
@@ -129,6 +150,13 @@ lab.experiment('Normal setup', function(done) {
         done();
     });
 
+    lab.test('routes do not have to have a policy', function(done) {
+        server.inject('/none', function(res) {
+            Code.expect(res.result).to.equal('none');
+            done();
+        });
+    });
+
     lab.test('passing policies get to route handler', function(done) {
         server.inject('/ok', function(res) {
             Code.expect(res.result).to.equal('ok');
@@ -145,9 +173,16 @@ lab.experiment('Normal setup', function(done) {
     });
 
     lab.test('failing policies with a custom message get the message sent in the reply', function(done) {
-        server.inject('/customfail', function(res) {
+        server.inject('/custommessage', function(res) {
             Code.expect(res.statusCode).to.equal(403);
             Code.expect(res.result.message).to.equal('custom');
+            done();
+        });
+    });
+
+    lab.test('failing policy can give a custom error', function(done) {
+        server.inject('/customerror', function(res) {
+            Code.expect(res.statusCode).to.equal(404);
             done();
         });
     });
