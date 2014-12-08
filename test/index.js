@@ -165,6 +165,16 @@ lab.experiment('Normal setup', function(done) {
         done();
     });
 
+    lab.test('does not allow duplication of policies', function(done) {
+        mrhorse.setup(server, {
+            policyDirectory: __dirname + '/policies'
+        }, function(err) {
+            Code.expect(err.toString()).to.equal('Error: Trying to add a duplicate policy: customError');
+            done();
+        });
+
+    });
+
     lab.test('routes do not have to have a policy', function(done) {
         server.inject('/none', function(res) {
             Code.expect(res.result).to.equal('none');
