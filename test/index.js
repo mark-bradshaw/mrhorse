@@ -69,13 +69,39 @@ lab.experiment('Normal setup', function(done) {
 
         server.route({
             method: 'GET',
-            path: '/',
+            path: '/ok',
             handler: function(request, reply) {
                 reply('ok');
             },
             config: {
                 plugins: {
                     policies: ['passes']
+                }
+            }
+        });
+
+        server.route({
+            method: 'GET',
+            path: '/fails',
+            handler: function(request, reply) {
+                reply('ok');
+            },
+            config: {
+                plugins: {
+                    policies: ['fails']
+                }
+            }
+        });
+
+        server.route({
+            method: 'GET',
+            path: '/customfail',
+            handler: function(request, reply) {
+                reply('ok');
+            },
+            config: {
+                plugins: {
+                    policies: ['customFail']
                 }
             }
         });
@@ -103,11 +129,26 @@ lab.experiment('Normal setup', function(done) {
         done();
     });
 
-    lab.test('passing test calls reply.continue', function(done) {
-        server.inject('/', function(res) {
+    lab.test('passing policies get to route handler', function(done) {
+        server.inject('/ok', function(res) {
             Code.expect(res.result).to.equal('ok');
             done();
         });
+    });
 
+    lab.test('failing policies get a 403', function(done) {
+        server.inject('/fails', function(res) {
+            Code.expect(res.statusCode).to.equal(403);
+            Code.expect(res.result.error).to.equal('Forbidden');
+            done();
+        });
+    });
+
+    lab.test('failing policies with a custom message get the message sent in the reply', function(done) {
+        server.inject('/customfail', function(res) {
+            Code.expect(res.statusCode).to.equal(403);
+            Code.expect(res.result.message).to.equal('custom');
+            done();
+        });
     });
 });
