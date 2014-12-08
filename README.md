@@ -4,6 +4,8 @@ Policies for [**hapi**](https://github.com/hapijs/hapi) routes.
 
 Lead Maintainer: [Mark Bradshaw](https://github.com/mark-bradshaw)
 
+[![Build Status](https://travis-ci.org/mark-bradshaw/mrhorse.svg?branch=master)
+
 ### Policies
 
 [MrHorse](https://github.com/mark-bradshaw/mrhorse) is useful for applying policies (characteristics) to routes in hapi.
