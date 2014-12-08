@@ -127,6 +127,21 @@ lab.experiment('Normal setup', function(done) {
             }
         });
 
+        server.route({
+            method: 'GET',
+            path: '/posthandler',
+            handler: function(request, reply) {
+                reply({
+                    handler: 'handler'
+                });
+            },
+            config: {
+                plugins: {
+                    policies: ['postHandler']
+                }
+            }
+        });
+
         mrhorse.setup(server, {
             policyDirectory: __dirname + '/policies'
         }, function(err) {
@@ -183,6 +198,14 @@ lab.experiment('Normal setup', function(done) {
     lab.test('failing policy can give a custom error', function(done) {
         server.inject('/customerror', function(res) {
             Code.expect(res.statusCode).to.equal(404);
+            done();
+        });
+    });
+
+    lab.test('policy can run as a posthandler', function(done) {
+        server.inject('/posthandler', function(res) {
+            Code.expect(res.statusCode).to.equal(200);
+            Code.expect(res.result.added).to.equal('this');
             done();
         });
     });
