@@ -1,5 +1,7 @@
 ## MrHorse
 
+"No sir, I didn't like it."
+
 Policies for [**hapi**](https://github.com/hapijs/hapi) routes.
 
 Lead Maintainer: [Mark Bradshaw](https://github.com/mark-bradshaw)
