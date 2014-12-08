@@ -51,8 +51,8 @@ lab.experiment('Non standard setups', function(done) {
             Code.expect(server.app.mrhorse.names.length).to.equal(0);
             try {
                 fs.rmdirSync(__dirname + '/emptypolicies');
-            } catch (err) {
-                console.log(err);
+            } catch (err2) {
+                console.log(err2);
             }
 
             done();

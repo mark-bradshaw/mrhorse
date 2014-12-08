@@ -1,34 +1,34 @@
 {
-  "name": "mrhorse",
-  "version": "0.0.2",
-  "description": "Apply policies to hapi routes",
-  "main": "index",
-  "scripts": {
-    "test": "node_modules/lab/bin/lab -vvc"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:mark-bradshaw/mrhorse.git"
-  },
-  "keywords": [
-    "hapi",
-    "policy"
-  ],
-  "author": "Mark Bradshaw <mark.bradshaw@gmail.com> and Brad Olson <brad.olson@movedbylight.com>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/mark-bradshaw/mrhorse/issues"
-  },
-  "homepage": "https://github.com/mark-bradshaw/mrhorse",
-  "dependencies": {
-    "async": "^0.9.0",
-    "boom": "^2.6.1",
-    "hoek": "^2.5.0",
-    "lodash": "^2.4.1"
-  },
-  "devDependencies": {
-    "code": "^1.2.1",
-    "hapi": "^8.0.0",
-    "lab": "^5.1.0"
-  }
+    "name": "mrhorse",
+    "version": "0.0.2",
+    "description": "Apply policies to hapi routes",
+    "main": "index",
+    "scripts": {
+        "test": "node_modules/lab/bin/lab -vvc"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:mark-bradshaw/mrhorse.git"
+    },
+    "keywords": [
+        "hapi",
+        "policy"
+    ],
+    "author": "Mark Bradshaw <mark.bradshaw@gmail.com> and Brad Olson <brad.olson@movedbylight.com>",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/mark-bradshaw/mrhorse/issues"
+    },
+    "homepage": "https://github.com/mark-bradshaw/mrhorse",
+    "dependencies": {
+        "async": "^0.9.0",
+        "boom": "^2.6.1",
+        "hoek": "^2.5.0",
+        "lodash": "^2.4.1"
+    },
+    "devDependencies": {
+        "code": "^1.2.1",
+        "hapi": "^8.0.0",
+        "lab": "^5.1.0"
+    }
 }
