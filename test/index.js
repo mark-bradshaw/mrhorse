@@ -31,11 +31,16 @@ lab.experiment('Non standard setups', function(done) {
         done();
     });
 
-    lab.test('requires a policy directory', function(done) {
-        mrhorse.setup(server, {}, function(err) {
-            Code.expect(err.toString()).to.equal('Error: policyDirectory is required for MrHorse.');
-            done();
-        });
+    lab.test('can register without a policy directory', function(done) {
+        server.register({
+                register: require('..'),
+                options: {}
+            },
+            function(err) {
+                Code.expect(server.plugins.mrhorse).to.be.an.object();
+                Code.expect(server.plugins.mrhorse.data.names.length).to.equal(0);
+                done();
+            });
     });
 
     lab.test('ignores an empty policy directory', function(done) {
@@ -44,19 +49,24 @@ lab.experiment('Non standard setups', function(done) {
         } catch (err) {
             console.log(err);
         }
-        mrhorse.setup(server, {
-            policyDirectory: __dirname + '/emptypolicies'
-        }, function(err) {
-            Code.expect(server.app.mrhorse).to.be.an.object();
-            Code.expect(server.app.mrhorse.names.length).to.equal(0);
-            try {
-                fs.rmdirSync(__dirname + '/emptypolicies');
-            } catch (err2) {
-                console.log(err2);
-            }
 
-            done();
-        });
+        server.register({
+                register: require('..'),
+                options: {
+                    policyDirectory: __dirname + '/emptypolicies'
+                }
+            },
+            function(err) {
+                Code.expect(server.plugins.mrhorse).to.be.an.object();
+                Code.expect(server.plugins.mrhorse.data.names.length).to.equal(0);
+                try {
+                    fs.rmdirSync(__dirname + '/emptypolicies');
+                } catch (err2) {
+                    console.log(err2);
+                }
+
+                done();
+            });
     });
 });
 
@@ -142,8 +152,11 @@ lab.experiment('Normal setup', function(done) {
             }
         });
 
-        mrhorse.setup(server, {
-            policyDirectory: __dirname + '/policies'
+        server.register({
+            register: require('..'),
+            options: {
+                policyDirectory: __dirname + '/policies'
+            }
         }, function(err) {
             if (err) {
                 console.log(err);
@@ -155,20 +168,19 @@ lab.experiment('Normal setup', function(done) {
     });
 
     lab.afterEach(function(done) {
+        server.plugins.mrhorse.reset();
         server.stop(function() {
             done();
         });
     });
 
     lab.test('loads policies from a directory', function(done) {
-        Code.expect(server.app.mrhorse.names.length).to.be.greaterThan(0);
+        Code.expect(server.plugins.mrhorse.data.names.length).to.be.greaterThan(0);
         done();
     });
 
     lab.test('does not allow duplication of policies', function(done) {
-        mrhorse.setup(server, {
-            policyDirectory: __dirname + '/policies'
-        }, function(err) {
+        server.plugins.mrhorse.loadPolicies(server, __dirname + '/policies', function(err) {
             Code.expect(err.toString()).to.equal('Error: Trying to add a duplicate policy: customError');
             done();
         });

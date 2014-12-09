@@ -1,6 +1,5 @@
 'use strict';
 
-var mrhorse = require('..');
 var Hapi = require('hapi');
 
 var server = new Hapi.Server();
@@ -8,14 +7,29 @@ server.connection({
     port: 3000
 });
 
-/* setup MrHorse */
-mrhorse.setup(server, {
-    policyDirectory: __dirname + '/policies'
-}, function(err) {
-    if (err) {
-        return console.log(err);
-    }
-});
+/* Register the MrHorse Plugin, and feed it an initial list of policies */
+server.register({
+        register: require('..'),
+        options: {
+            policyDirectory: __dirname + '/policies'
+        }
+    },
+    function(err) {
+        if (err) {
+            return console.log(err);
+        }
+    });
+
+/* Register another plugin to show how Mr Horse is used by other plugins. */
+server.register({
+        register: require('./another_plugin'),
+        options: {}
+    },
+    function(err) {
+        if (err) {
+            return console.log(err);
+        }
+    });
 
 /* Make a couple routes for example purposes. */
 server.route({
@@ -29,7 +43,9 @@ server.route({
             '<br /><a href="/admin">http://localhost:3000/admin</a> - This will give a 403' +
             '<br /><a href="/admin?loggedin=true">http://localhost:3000/admin?loggedin=true</a> - This will give a 403 with a special message' +
             '<br /><a href="/admin?loggedin=true&admin=true">http://localhost:3000/admin?loggedin=true&admin=true</a> - mixing multiple policies' +
-            '<br /><a href="/addanalytics">http://localhost:3000/addanalytics</a> - Part of this JSON data is injected in a post handler');
+            '<br /><a href="/addanalytics">http://localhost:3000/addanalytics</a> - Part of this JSON data is injected in a post handler' +
+            '<br /><a href="/otherplugin">http://localhost:3000/otherplugin</a> - This route comes from a plugin, which can also use Mr Horse.  This will give a 403.' +
+            '<br /><a href="/otherplugin?loggedin=true">http://localhost:3000/otherplugin?loggedin=true</a> - Here is that route, logged in');
     }
 });
 
