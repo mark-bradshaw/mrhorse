@@ -1,18 +1,24 @@
 ## MrHorse
 
-"No sir, I don't like it."
-
-Policies for [**hapi**](https://github.com/hapijs/hapi) routes.
+Manage your [**hapi**](https://github.com/hapijs/hapi) routes with modular policies.
 
 Lead Maintainer: [Mark Bradshaw](https://github.com/mark-bradshaw)
 
 [![Build Status](https://travis-ci.org/mark-bradshaw/mrhorse.svg?branch=master)](https://travis-ci.org/mark-bradshaw/mrhorse)
 
+### What
+
+This is inspired in part by policies in the sails.js project.  In sails they are mostly used for authentication and authorization.  In hapi they can do just about anything.  Wouldn't it be nice to easily configure your routes for authentication by adding an 'isLoggedIn' tag?  Or before reply to a page checking to see if 'userHasAccessToWidget'?  Maybe you'd like to add some special analytics tracking to some of your api requests.  Just put 'addAnalytics' to the routes that need it.
+
+MrHorse allows you to do this in a way that centralizes repeated code, and very visibly demonstrates what routes are doing.  You don't have to guess any more whether a route is performing an action.
+
 ### Why
 
-[MrHorse](https://github.com/mark-bradshaw/mrhorse) is useful for applying policies to routes in hapi.  Policies are a good fit whenever you find yourself repeating code in your handlers.  Policies can be used for authentication, authorization, reply modification and shaping, or logging.  You might have policies like `isLoggedIn`, `hasAccessToWidget`, `addTracking`, or `logForAnalytics`.  Policies can be applied as either a pre-handler, before the request is processed, or a post-handler, after a response has been created, or both.
+Often your route handlers end up doing a lot of repeated work to collect data, check for user rights, tack on special data, and otherwise prepare to do the work of reply to a request.  It'd be very nice to keep the code that keeps getting repeated in a single location, and just apply it to routes as needed. Often you end up repeating the same small bit of code across a lot of handlers to check for rights, or generate some tracking code, update a cookie, etc.  It's hard to see where these actions are happening across your site, and updating that code to correct a bug can be tricky.
 
-Using policies you can easily mix and match your business logic into your routes in a declarative manner.  This makes it much easier to see what is being done on each route, and allows you to centralize your authentication, authorization, or logging in one place to DRY out your code.
+[MrHorse](https://github.com/mark-bradshaw/mrhorse) let's you take those repeated bits of code and centralize them into a "policy."  Policies are a good fit whenever you find yourself repeating code in your handlers.  Policies can be used for authentication, authorization, reply modification and shaping, logging, or just about anything else you can imagine.  Policies can be applied as either a pre-handler, before the request is processed, or a post-handler, after a response has been created, or both.  Once you've created a policy, you just apply it to whatever routes need it and let MrHorse take care of the rest.
+
+Using policies you can easily mix and match your business logic into your routes in a declarative manner.  This makes it much easier to see what is being done on each route, and allows you to centralize your authentication, authorization, or logging in one place to DRY out your code.  If a policy decides that there's a problem with the current request is can immediately reply back with a 403 forbidden error, or the error of your choice.
 
 ### Examples
 
