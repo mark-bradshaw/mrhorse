@@ -6,13 +6,38 @@ Lead Maintainer: [Mark Bradshaw](https://github.com/mark-bradshaw)
 
 [![Build Status](https://travis-ci.org/mark-bradshaw/mrhorse.svg?branch=master)](https://travis-ci.org/mark-bradshaw/mrhorse)
 
-### What
+### What is it?
 
 This is inspired in part by policies in the sails.js project.  In sails they are mostly used for authentication and authorization.  In hapi they can do just about anything.  Wouldn't it be nice to easily configure your routes for authentication by adding an 'isLoggedIn' tag?  Or before reply to a page checking to see if 'userHasAccessToWidget'?  Maybe you'd like to add some special analytics tracking to some of your api requests, after your controller has responded.
 
 MrHorse allows you to do all of these and more in a way that centralizes repeated code, and very visibly demonstrates what routes are doing.  You don't have to guess any more whether a route is performing an action.
 
-### Why
+It looks like this:
+```
+server.route({
+    method: 'GET',
+    path: '/loggedin',
+    handler: function(request, reply) {},
+    config: {
+        plugins: {
+            policies: ['isLoggedIn']
+        }
+    }
+});
+
+server.route({
+    method: 'GET',
+    path: '/admin',
+    handler: function(request, reply) {},
+    config: {
+        plugins: {
+            policies: ['isLoggedIn', 'isAnAdmin']
+        }
+    }
+});
+```
+
+### Why use this
 
 Often your route handlers end up doing a lot of repeated work to collect data, check for user rights, tack on special data, and otherwise prepare to do the work of reply to a request.  It'd be very nice to keep the code that keeps getting repeated in a single location, and just apply it to routes as needed. Often you end up repeating the same small bit of code across a lot of handlers to check for rights, or generate some tracking code, update a cookie, etc.  It's hard to see where these actions are happening across your site, and updating that code to correct a bug can be tricky.
 
