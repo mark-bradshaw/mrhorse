@@ -45,6 +45,17 @@ Often your route handlers end up doing a lot of repeated work to collect data, c
 
 Using policies you can easily mix and match your business logic into your routes in a declarative manner.  This makes it much easier to see what is being done on each route, and allows you to centralize your authentication, authorization, or logging in one place to DRY out your code.  If a policy decides that there's a problem with the current request is can immediately reply back with a 403 forbidden error, or the error of your choice.
 
+
+### Why use this instead of Hapi route prerequisites
+
+Hapi provides a somewhat similar mechanism for doing things before a route handler is executed, called route prerequisites.  MrHorse seems to be overlapping this functionality, so why not just use prerequisites?
+
+1. MrHorse puts more focus on whether to continue on to the next policy, allowing you to more easily short circuit a request and skip other policies or the route handler.  This makes authentication and authorization tasks more straightforward.  Since you can stop processing with any policy, it allows you to fail quickly and early, and avoid later processing.
+1. MrHorse gives you the option of running policies **after** the route handler.  This allows you to easily modify responses, add additional data, or do logging tasks and still run your normal handler.  With prerequisites, you can take over a response, but your route handler won't get run.  It gives you no ability to do additional processing post handler.
+1. MrHorse helps you to keep your policy type code in a central location, and loads it up for you.  Prerequisites don't provide any help with this.
+1. MrHorse can be easily modified to allow policies to run at even more places in the request life cycle.  This is a flexibility that prerequisites probably will never have.
+
+
 ### Examples
 
 Look in the `example` folder to see MrHorse in action.
