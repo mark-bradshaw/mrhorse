@@ -1,6 +1,6 @@
 {
     "name": "mrhorse",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "Apply policies to hapi routes",
     "main": "index",
     "scripts": {
