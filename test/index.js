@@ -152,6 +152,21 @@ lab.experiment('Normal setup', function(done) {
             }
         });
 
+        server.route({
+            method: 'GET',
+            path: '/twopolicies',
+            handler: function(request, reply) {
+                reply({
+                    handler: 'handler'
+                });
+            },
+            config: {
+                plugins: {
+                    policies: ['passes', 'secondPasses']
+                }
+            }
+        });
+
         server.register({
             register: require('..'),
             options: {
@@ -228,6 +243,14 @@ lab.experiment('Normal setup', function(done) {
         server.inject('/posthandler', function(res) {
             Code.expect(res.statusCode).to.equal(200);
             Code.expect(res.result.added).to.equal('this');
+            done();
+        });
+    });
+
+    lab.test('runs all policies', function(done) {
+        server.inject('/twopolicies', function(res) {
+            Code.expect(res.statusCode).to.equal(200);
+            Code.expect(res.result.ranSecondPasses).to.equal(true);
             done();
         });
     });
