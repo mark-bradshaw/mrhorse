@@ -20,7 +20,7 @@ server.route({
     handler: function(request, reply) {},
     config: {
         plugins: {
-            policies: ['isLoggedIn']
+            policies: ['isLoggedIn', 'addTracking', 'logThis']
         }
     }
 });
@@ -31,7 +31,7 @@ server.route({
     handler: function(request, reply) {},
     config: {
         plugins: {
-            policies: ['isLoggedIn', 'isAnAdmin']
+            policies: ['isLoggedIn', 'isAnAdmin', 'onlyInUS']
         }
     }
 });
