@@ -60,6 +60,7 @@ Hapi provides a somewhat similar mechanism for doing things before a route handl
 
 Look in the `example` folder to see MrHorse in action.
 
+
 ### Install
 
 To install mrhorse:
@@ -67,6 +68,7 @@ To install mrhorse:
 ```
 npm install mark-bradshaw/mrhorse --save
 ```
+
 
 ### Setup
 
