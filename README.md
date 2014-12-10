@@ -8,7 +8,7 @@ Lead Maintainer: [Mark Bradshaw](https://github.com/mark-bradshaw)
 
 ### What is it?
 
-This is inspired in part by policies in the sails.js project.  In sails they are mostly used for authentication and authorization.  In hapi they can do just about anything.  Wouldn't it be nice to easily configure your routes for authentication by adding an 'isLoggedIn' tag?  Or before reply to a page checking to see if 'userHasAccessToWidget'?  Maybe you'd like to add some special analytics tracking to some of your api requests, after your controller has responded.
+This is inspired in part by policies in the sails.js project.  In sails they are mostly used for authentication and authorization.  In hapi they can do just about anything.  Wouldn't it be nice to easily configure your routes for authentication by adding an 'isLoggedIn' tag?  Or before replying to a request checking to see if 'userHasAccessToWidget'?  You'd like to do some a/b testing, and want to change some requests to a different handler.  Maybe you'd like to add some special analytics tracking to some of your api requests, after your controller has already responded.  Trying to log some requests, but not others? 
 
 MrHorse allows you to do all of these and more in a way that centralizes repeated code, and very visibly demonstrates what routes are doing.  You don't have to guess any more whether a route is performing an action.
 
