@@ -29,6 +29,7 @@
   },
   "devDependencies": {
     "code": "^1.2.1",
+    "coveralls": "^2.11.2",
     "hapi": "^8.0.0",
     "lab": "^5.1.0"
   }
