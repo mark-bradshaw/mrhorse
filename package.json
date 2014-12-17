@@ -4,7 +4,7 @@
     "description": "Apply policies to hapi routes",
     "main": "index",
     "scripts": {
-        "test": "node_modules/lab/bin/lab -r lcov | node node_modules/coveralls/bin/coveralls.js && node_modules/lab/bin/lab -vvc"
+        "test": "node_modules/lab/bin/lab -r lcov | node node_modules/coveralls/bin/coveralls.js; node_modules/lab/bin/lab -vvc"
     },
     "repository": {
         "type": "git",
