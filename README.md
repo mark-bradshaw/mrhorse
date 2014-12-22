@@ -66,7 +66,7 @@ Look in the `example` folder to see MrHorse in action.
 To install mrhorse:
 
 ```
-npm install mark-bradshaw/mrhorse --save
+npm install mrhorse --save
 ```
 
 
