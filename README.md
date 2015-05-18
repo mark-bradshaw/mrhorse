@@ -81,6 +81,8 @@ server.register({
         register: require('mrhorse'),
         options: {
             policyDirectory: __dirname + '/policies'
+            preHandler: 'onPreHandler' /* optional */,
+            postHandler: 'onPostHandler' /* optional */
         }
     },
     function(err) {
@@ -91,7 +93,7 @@ server.register({
 Or you can provide a directory location using the `loadPolicies` function, like this:
 
 ```
-server.plugins.mrhorse.loadPolicies(server, __dirname + '/policies', function(err) {
+server.plugins.mrhorse.loadPolicies(server, {policyDirectory:__dirname + '/policies', preHandler: 'onPreHandler' /* optional */, postHandler: 'onPostHandler' /* optional */}, function(err) {
   ...
 });
 ```
@@ -99,6 +101,9 @@ server.plugins.mrhorse.loadPolicies(server, __dirname + '/policies', function(er
 Both strategies are fine, and can be complementary.  If your hapi project uses plugins to separate up functionality it is perfectly acceptable for each plugin to have its own `policies` folder.  Just use the `loadPolicies` function in each plugin.  See the example folder for additional detail.
 
 You can use mrhorse in as many places as you want.  It's ok to have multiple policies folders in different locations, and tell mrhorse to look in each one.  The only requirement is that each policy file name **must** be globally unique.
+
+You can pass additional parameters ```preHandler``` and ```postHandler``` which would define when exectly your policies would be applied. The values should be the valid values from the [hapi request lifecycle](http://hapijs.com/api#request-lifecycle).
+By default (if the options are not stated) ```preHandler``` is set to *onPreHandler* and ```postHandler``` is equal to *onPostHandler*.
 
 #### Policies
 
