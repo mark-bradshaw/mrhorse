@@ -93,8 +93,12 @@ server.register({
 Or you can provide a directory location using the `loadPolicies` function, like this:
 
 ```
-server.plugins.mrhorse.loadPolicies(server, {policyDirectory:__dirname + '/policies', preHandler: 'onPreHandler' /* optional */, postHandler: 'onPostHandler' /* optional */}, function(err) {
-  ...
+server.plugins.mrhorse.loadPolicies(server, {
+    policyDirectory: __dirname + '/policies',
+    preHandler: 'onPreHandler' /* optional */ ,
+    postHandler: 'onPostHandler' /* optional */
+}, function(err) {
+...
 });
 ```
 
