@@ -94,12 +94,12 @@ Or you can provide a directory location using the `loadPolicies` function, like 
 
 ```
 server.plugins.mrhorse.loadPolicies(server, {
-    policyDirectory: __dirname + '/policies',
-    preHandler: 'onPreHandler' /* optional */ ,
-    postHandler: 'onPostHandler' /* optional */
-}, function(err) {
-...
-});
+        policyDirectory: __dirname + '/policies',
+        preHandler: 'onPreHandler' /* optional */ ,
+        postHandler: 'onPostHandler' /* optional */
+    }, function(err) {
+    ...
+    });
 ```
 
 Both strategies are fine, and can be complementary.  If your hapi project uses plugins to separate up functionality it is perfectly acceptable for each plugin to have its own `policies` folder.  Just use the `loadPolicies` function in each plugin.  See the example folder for additional detail.
