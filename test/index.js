@@ -77,6 +77,36 @@ lab.experiment('Non standard setups', function (done) {
 
             });
     });
+
+    lab.test('incorrect applyPoint', function (done) {
+
+        try {
+            fs.mkdirSync(__dirname + '/incorrect-policies');
+            fs.writeFileSync(__dirname+'/incorrect-policies/incorrectApplyPoint.js', fs.readFileSync(__dirname+'/fixtures/incorrectApplyPoint.js'));
+        } catch (err) {
+            console.log(err);
+        }
+
+        server.register({
+                register: require('..'),
+                options : {
+                    policyDirectory: __dirname + '/incorrect-policies'
+                }
+            },
+            function (err) {
+
+                Code.expect(err.toString()).to.equal('Error: Trying to set incorrect applyPoint for the policy: onIncorrect');
+                try {
+                    fs.unlinkSync(__dirname + '/incorrect-policies/incorrectApplyPoint.js');
+                    fs.rmdirSync(__dirname + '/incorrect-policies');
+                } catch (err2) {
+                    console.log(err2);
+                }
+
+                done();
+
+            });
+    });
 });
 
 lab.experiment('Normal setup', function (done) {
