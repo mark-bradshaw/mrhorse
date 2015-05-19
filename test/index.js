@@ -51,6 +51,7 @@ lab.experiment('Non standard setups', function (done) {
 
         try {
             fs.mkdirSync(__dirname + '/emptypolicies');
+
         } catch (err) {
             console.log(err);
         }
@@ -72,6 +73,8 @@ lab.experiment('Non standard setups', function (done) {
                 }
 
                 done();
+
+
             });
     });
 });
@@ -89,7 +92,6 @@ lab.experiment('Normal setup', function (done) {
             method : 'GET',
             path   : '/none',
             handler: function (request, reply) {
-
                 reply('none');
             }
         });
@@ -202,8 +204,7 @@ lab.experiment('Normal setup', function (done) {
             register: require('..'),
             options : {
                 policyDirectory: __dirname + '/policies',
-                preHandler: 'onPreHandler',
-                postHandler: 'onPostHandler'
+                applyPoint: 'onPreHandler'
             }
         }, function (err) {
 
@@ -245,7 +246,6 @@ lab.experiment('Normal setup', function (done) {
     lab.test('routes do not have to have a policy', function (done) {
 
         server.inject('/none', function (res) {
-
             Code.expect(res.result).to.equal('none');
             done();
         });
@@ -300,9 +300,7 @@ lab.experiment('Normal setup', function (done) {
     });
 
     lab.test('runs all policies', function (done) {
-
         server.inject('/twopolicies', function (res) {
-
             Code.expect(res.statusCode).to.equal(200);
             Code.expect(res.result.ranSecondPasses).to.equal(true);
             done();
