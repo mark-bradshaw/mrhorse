@@ -2,7 +2,7 @@
 
 Manage your [**hapi**](https://github.com/hapijs/hapi) routes with modular policies.  Hapi 8 ready!
 
-Lead Maintainer: [Mark Bradshaw](https://github.com/mark-bradshaw)
+Lead Maintainer: [Mark Bradshaw](https://github.com/mark-bradshaw), [contributors](CONTRIBUTORS.md)
 
 [![Build Status](https://travis-ci.org/mark-bradshaw/mrhorse.svg?branch=master)](https://travis-ci.org/mark-bradshaw/mrhorse) [![Coverage Status](https://img.shields.io/coveralls/mark-bradshaw/mrhorse.svg)](https://coveralls.io/r/mark-bradshaw/mrhorse) [![Dependencies Up To Date](https://david-dm.org/mark-bradshaw/mrhorse.svg?style=flat)](https://david-dm.org/mark-bradshaw/mrhorse)
 
@@ -81,6 +81,7 @@ server.register({
         register: require('mrhorse'),
         options: {
             policyDirectory: __dirname + '/policies'
+            applyPoint: 'onPreHandler' /* optional */,
         }
     },
     function(err) {
@@ -91,14 +92,20 @@ server.register({
 Or you can provide a directory location using the `loadPolicies` function, like this:
 
 ```
-server.plugins.mrhorse.loadPolicies(server, __dirname + '/policies', function(err) {
-  ...
-});
+server.plugins.mrhorse.loadPolicies(server, {
+        policyDirectory: __dirname + '/policies',
+        applyPoint: 'onPreAuth' /* optional */ 
+    }, function(err) {
+    ...
+    });
 ```
 
 Both strategies are fine, and can be complementary.  If your hapi project uses plugins to separate up functionality it is perfectly acceptable for each plugin to have its own `policies` folder.  Just use the `loadPolicies` function in each plugin.  See the example folder for additional detail.
 
 You can use mrhorse in as many places as you want.  It's ok to have multiple policies folders in different locations, and tell mrhorse to look in each one.  The only requirement is that each policy file name **must** be globally unique.
+
+You can pass additional parameters ```preHandler``` and ```postHandler``` which would define when exectly your policies would be applied. The values should be the valid values from the [hapi request lifecycle](http://hapijs.com/api#request-lifecycle).
+By default (if the options are not stated) ```applyPoint``` is set to *onPreHandler*.
 
 #### Policies
 
@@ -115,8 +122,7 @@ var isAdmin = function(request, reply, next) {
 };
 
 // These are optional
-isAdmin.pre = true;
-isAdmin.post = false;
+isAdmin.applyPoint = 'onPreHandler;
 
 module.exports = isAdmin;
 ```
@@ -150,4 +156,61 @@ var routes = [
        }
    }
 ];
+```
+
+##### updating from v0.0.3
+In case you were using mrhorse < 0.0.4, it might be, you should update your code.
+
+1. All the cases of the direct plugin initialisation should be updated from 
+```
+server.plugins.mrhorse.loadPolicies(server, __dirname + '/policies', function(err) {
+    ...
+    });
+```
+
+to
+```
+server.plugins.mrhorse.loadPolicies(server, {
+        policyDirectory: __dirname + '/policies',
+        applyPoint: 'onPreAuth' /* optional */ 
+    }, function(err) {
+    ...
+    });
+```
+
+As you see - currently the options should be sent like an object.
+
+2. If you were using the ```post``` configuration option in our policy, like:
+```
+var isAdmin = function(request, reply, next) {
+   var role = _do_something_to_check_user_role(request); // Dummy code
+   if (role && (role === 'admin')) {
+       return next(null, true); // All is well with this request.  Proceed to the next policy or the route handler.
+   } else {
+       return next(null, false); // This policy is not satisfied.  Return a 403 forbidden.
+   }
+};
+
+// These are optional
+isAdmin.post = true;
+
+module.exports = isAdmin;
+```
+
+You should update it to:
+
+```
+var isAdmin = function(request, reply, next) {
+   var role = _do_something_to_check_user_role(request); // Dummy code
+   if (role && (role === 'admin')) {
+       return next(null, true); // All is well with this request.  Proceed to the next policy or the route handler.
+   } else {
+       return next(null, false); // This policy is not satisfied.  Return a 403 forbidden.
+   }
+};
+
+// These are optional
+isAdmin.applyPoint = 'onPostHandler';
+
+module.exports = isAdmin;
 ```
