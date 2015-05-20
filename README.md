@@ -13,7 +13,7 @@ This is inspired in part by policies in the sails.js project.  In sails they are
 MrHorse allows you to do all of these and more in a way that centralizes repeated code, and very visibly demonstrates what routes are doing.  You don't have to guess any more whether a route is performing an action.
 
 It looks like this:
-```
+```javascript
 server.route({
     method: 'GET',
     path: '/loggedin',
@@ -76,7 +76,7 @@ npm install mrhorse --save
 
 Once you have created your policies directory you must tell mrhorse where it is.  You do this in two ways.  You can either pass the directory location in to the mrhorse plugin when you register it, like this:
 
-```
+```javascript
 server.register({
         register: require('mrhorse'),
         options: {
@@ -91,7 +91,7 @@ server.register({
 
 Or you can provide a directory location using the `loadPolicies` function, like this:
 
-```
+```javascript
 server.plugins.mrhorse.loadPolicies(server, {
         policyDirectory: __dirname + '/policies',
         applyPoint: 'onPreAuth' /* optional */ 
@@ -111,7 +111,7 @@ By default (if the options are not stated) ```applyPoint``` is set to *onPreHand
 
 Now create a policy file inside the `policies` folder.  This is just a simple file that exports one javascript function.  The name of the file should be the name you want to use for your policy.  Mrhorse uses the file name, **not** the function name, to identify the policy so make sure you name the file appropriately.  If this policy file is named `isAdmin.js`, then the policy would be identified as `isAdmin`.
 
-```
+```javascript
 var isAdmin = function(request, reply, next) {
    var role = _do_something_to_check_user_role(request); // Dummy code
    if (role && (role === 'admin')) {
@@ -143,7 +143,7 @@ Post handlers can alter the response before it gets sent.  This is useful if you
 
 Now that you've created your policy, apply it to whatever routes you want.
 
-```
+```javascript
 var routes = [
    {
        method: 'your_method',
@@ -161,15 +161,14 @@ var routes = [
 ##### updating from v0.0.3
 In case you were using mrhorse < 0.0.4, it might be, you should update your code.
 
-1. All the cases of the direct plugin initialisation should be updated from 
-```
+* All the cases of the direct plugin initialisation should be updated from 
+```javascript
 server.plugins.mrhorse.loadPolicies(server, __dirname + '/policies', function(err) {
     ...
     });
 ```
-
 to
-```
+```javascript
 server.plugins.mrhorse.loadPolicies(server, {
         policyDirectory: __dirname + '/policies',
         applyPoint: 'onPreAuth' /* optional */ 
@@ -177,11 +176,10 @@ server.plugins.mrhorse.loadPolicies(server, {
     ...
     });
 ```
-
 As you see - currently the options should be sent like an object.
 
-2. If you were using the ```post``` configuration option in our policy, like:
-```
+* If you were using the ```post``` configuration option in our policy, like:
+```javascript
 var isAdmin = function(request, reply, next) {
    var role = _do_something_to_check_user_role(request); // Dummy code
    if (role && (role === 'admin')) {
@@ -199,7 +197,7 @@ module.exports = isAdmin;
 
 You should update it to:
 
-```
+```javascript
 var isAdmin = function(request, reply, next) {
    var role = _do_something_to_check_user_role(request); // Dummy code
    if (role && (role === 'admin')) {
