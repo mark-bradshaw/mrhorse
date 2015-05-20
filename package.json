@@ -1,36 +1,36 @@
 {
-    "name": "mrhorse",
-    "version": "1.0.0",
-    "description": "Apply policies to hapi routes",
-    "main": "index",
-    "scripts": {
-        "test": "node_modules/lab/bin/lab -r lcov | node node_modules/coveralls/bin/coveralls.js; node_modules/lab/bin/lab -vvc"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git@github.com:mark-bradshaw/mrhorse.git"
-    },
-    "keywords": [
-        "hapi",
-        "policy"
-    ],
-    "author": "Mark Bradshaw <mark.bradshaw@gmail.com>, Brad Olson <brad.olson@movedbylight.com>, Pavel Polyakov",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/mark-bradshaw/mrhorse/issues"
-    },
-    "homepage": "https://github.com/mark-bradshaw/mrhorse",
-    "dependencies": {
-        "async": "^0.9.0",
-        "boom": "^2.6.1",
-        "coveralls": "^2.11.2",
-        "hoek": "^2.5.0",
-        "lodash": "^2.4.1"
-    },
-    "devDependencies": {
-        "code": "^1.2.1",
-        "coveralls": "^2.11.2",
-        "hapi": "^8.0.0",
-        "lab": "^5.1.0"
-    }
+  "name": "mrhorse",
+  "version": "1.0.0",
+  "description": "Apply policies to hapi routes",
+  "main": "index",
+  "scripts": {
+    "test": "node_modules/lab/bin/lab -r lcov | node node_modules/coveralls/bin/coveralls.js; node_modules/lab/bin/lab -vvc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:mark-bradshaw/mrhorse.git"
+  },
+  "keywords": [
+    "hapi",
+    "policy"
+  ],
+  "author": "Mark Bradshaw <mark.bradshaw@gmail.com>, Brad Olson <brad.olson@movedbylight.com>, Pavel Polyakov",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mark-bradshaw/mrhorse/issues"
+  },
+  "homepage": "https://github.com/mark-bradshaw/mrhorse",
+  "dependencies": {
+    "async": "^0.9.0",
+    "boom": "^2.6.1",
+    "coveralls": "^2.11.2",
+    "hoek": "^2.13.0",
+    "lodash": "^3.9.1"
+  },
+  "devDependencies": {
+    "code": "^1.2.1",
+    "coveralls": "^2.11.2",
+    "hapi": "^8.4.0",
+    "lab": "^5.8.1"
+  }
 }
