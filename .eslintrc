@@ -11,7 +11,7 @@
         "max-depth": [1, 3],
         "complexity": [2, 7],
         "max-params": [1, 3],
-        "max-nested-callbacks": [2, 2],
+        "max-nested-callbacks": [2, 3],
         "consistent-this": [1, "self"],
         "no-extra-bind": 1,
         "space-after-keywords": [2, "always"],

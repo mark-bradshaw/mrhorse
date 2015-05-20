@@ -1,8 +1,11 @@
+/* eslint-disable */
+
 var Code = require('code');
 var fs = require('fs');
 var Hapi = require('hapi');
 var Lab = require('lab');
 var lab = exports.lab = Lab.script();
+var util = require('util');
 
 var mrhorse = require('..');
 
@@ -37,9 +40,9 @@ lab.experiment('Non standard setups', function (done) {
 
         server.register({
                 register: require('..'),
-                options : {}
+                options: {}
             },
-            function (err) {
+            function () {
 
                 Code.expect(server.plugins.mrhorse).to.be.an.object();
                 Code.expect(server.plugins.mrhorse.data.names.length).to.equal(0);
@@ -51,38 +54,63 @@ lab.experiment('Non standard setups', function (done) {
 
         try {
             fs.mkdirSync(__dirname + '/emptypolicies');
-
-        } catch (err) {
+        }
+        catch (err) {
             console.log(err);
         }
 
         server.register({
                 register: require('..'),
-                options : {
+                options: {
                     policyDirectory: __dirname + '/emptypolicies'
                 }
             },
-            function (err) {
+            function () {
 
                 Code.expect(server.plugins.mrhorse).to.be.an.object();
                 Code.expect(server.plugins.mrhorse.data.names.length).to.equal(0);
+
+                // cleanup
                 try {
                     fs.rmdirSync(__dirname + '/emptypolicies');
-                } catch (err2) {
-                    console.log(err2);
+                }
+                catch (err) {
+                    console.log(err);
                 }
 
                 done();
-
-
             });
     });
 
+    lab.test('accepts an alternate default apply point', function(done) {
+
+        server.register({
+            register: require('..'),
+            options : {
+                policyDirectory: __dirname + '/policies',
+                defaultApplyPoint: 'onPostHandler'
+            }
+        }, function (err) {
+
+            if (err) {
+                console.log(err);
+            }
+
+            Code.expect(server.plugins.mrhorse.data.setHandlers.onPostHandler).to.equal(true);
+            Code.expect(Object.keys(server.plugins.mrhorse.data.onPostHandler).length).to.equal(7);
+
+            server.plugins.mrhorse.reset();
+
+            done();
+        });
+    })
+
     lab.test('incorrect applyPoint', function (done) {
 
+        // pull this bad policy in to the policies folder.
         try {
             fs.mkdirSync(__dirname + '/incorrect-policies');
-            fs.writeFileSync(__dirname+'/incorrect-policies/incorrectApplyPoint.js', fs.readFileSync(__dirname+'/fixtures/incorrectApplyPoint.js'));
+            fs.writeFileSync(__dirname + '/incorrect-policies/incorrectApplyPoint.js', fs.readFileSync(__dirname + '/fixtures/incorrectApplyPoint.js'));
         } catch (err) {
             console.log(err);
         }
@@ -96,6 +124,9 @@ lab.experiment('Non standard setups', function (done) {
             function (err) {
 
                 Code.expect(err.toString()).to.equal('Error: Trying to set incorrect applyPoint for the policy: onIncorrect');
+
+                // cleanup
+                server.plugins.mrhorse.reset();
                 try {
                     fs.unlinkSync(__dirname + '/incorrect-policies/incorrectApplyPoint.js');
                     fs.rmdirSync(__dirname + '/incorrect-policies');
@@ -234,7 +265,7 @@ lab.experiment('Normal setup', function (done) {
             register: require('..'),
             options : {
                 policyDirectory: __dirname + '/policies',
-                applyPoint: 'onPreHandler'
+                defaultApplyPoint: 'onPreHandler'
             }
         }, function (err) {
 

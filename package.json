@@ -1,6 +1,6 @@
 {
     "name": "mrhorse",
-    "version": "0.0.3",
+    "version": "1.0.0",
     "description": "Apply policies to hapi routes",
     "main": "index",
     "scripts": {
@@ -14,7 +14,7 @@
         "hapi",
         "policy"
     ],
-    "author": "Mark Bradshaw <mark.bradshaw@gmail.com> and Brad Olson <brad.olson@movedbylight.com>",
+    "author": "Mark Bradshaw <mark.bradshaw@gmail.com>, Brad Olson <brad.olson@movedbylight.com>, Pavel Polyakov",
     "license": "MIT",
     "bugs": {
         "url": "https://github.com/mark-bradshaw/mrhorse/issues"
