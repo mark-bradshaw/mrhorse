@@ -1,6 +1,6 @@
 ## MrHorse
 
-Manage your [**hapi**](https://github.com/hapijs/hapi) routes with modular policies.  Hapi 8 ready!
+Manage your [**hapi**](https://github.com/hapijs/hapi) routes with modular policies.
 
 Lead Maintainer: [Mark Bradshaw](https://github.com/mark-bradshaw), [contributors](CONTRIBUTORS.md)
 
