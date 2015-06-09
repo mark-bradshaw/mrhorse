@@ -12,7 +12,9 @@ var after = function(server, next) {
     for kicks we'll load our own logged in policy.  Just keep in mind, ALL
     plugins MUST be uniquely named.  We can't have a policy that is also
     named isLoggedIn, because that was already used in the main policy directory. */
-    server.plugins.mrhorse.loadPolicies(server, __dirname + '/policies', function(err) {
+    server.plugins.mrhorse.loadPolicies(server, {
+        policyDirectory: __dirname + '/policies'
+    }, function(err) {
 
         if (err) {
             console.log(err);
