@@ -33,6 +33,9 @@ lab.experiment('Non standard setups', function (done) {
     lab.beforeEach(function (done) {
 
         server = new Hapi.Server();
+        server.connection({
+            port: 12345
+        });
         done();
     });
 
