@@ -195,12 +195,13 @@ If your policy has nothing to do with authentication or authorization, you will 
 By default all policies are assumed to be pre-handlers unless you specify otherwise.  You can, however, choose to run a policy at any point in the request life cycle by specifying one of the event names that Hapi provides.  If you would like additional information about events are called in the Hapi request life cycle, please refer to the [Hapi documentation](http://hapijs.com/api#request-lifecycle).
 
 The events in the life cycle are:
-1. 'onRequest',
-1. 'onPreAuth',
-1. 'onPostAuth',
-1. 'onPreHandler',
-1. 'onPostHandler',
-1. 'onPreResponse'
+
+1. 'onRequest'
+2. 'onPreAuth'
+3. 'onPostAuth'
+4. 'onPreHandler'
+5. 'onPostHandler'
+6. 'onPreResponse'
 
 Post handlers can alter the response created by the response handler before it gets sent.  This is useful if you want to add additional data to the response before it goes out on the wire.  The response can be found in `request.response.source`, **only** after the request handler has run.  Before that time there is no response object.
 
