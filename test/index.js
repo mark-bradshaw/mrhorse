@@ -264,6 +264,22 @@ lab.experiment('Normal setup', function (done) {
             }
         });
 
+        server.route({
+            method : 'GET',
+            path   : '/misspelled-policy',
+            handler: function (request, reply) {
+
+                reply({
+                    handler: 'handler'
+                });
+            },
+            config : {
+                plugins: {
+                    policies: ['misspelled']
+                }
+            }
+        });
+
         server.register({
             register: require('..'),
             options : {
@@ -310,6 +326,7 @@ lab.experiment('Normal setup', function (done) {
     lab.test('routes do not have to have a policy', function (done) {
 
         server.inject('/none', function (res) {
+
             Code.expect(res.result).to.equal('none');
             done();
         });
@@ -364,7 +381,9 @@ lab.experiment('Normal setup', function (done) {
     });
 
     lab.test('runs all policies', function (done) {
+        
         server.inject('/twopolicies', function (res) {
+
             Code.expect(res.statusCode).to.equal(200);
             Code.expect(res.result.ranSecondPasses).to.equal(true);
             done();
@@ -374,7 +393,17 @@ lab.experiment('Normal setup', function (done) {
     lab.test('policy which redirects', function (done) {
 
         server.inject('/redirects', function (res) {
+
             Code.expect(res.statusCode).to.equal(302);
+            done();
+        });
+    });
+
+    lab.test('error on misspelled policy', function (done) {
+
+        server.inject('/misspelled-policy', function (res) {
+
+            Code.expect(res.statusCode).to.equal(501);
             done();
         });
     });
