@@ -1,6 +1,6 @@
 'use strict';
 
-var isAnAdmin = function(request, reply, callback) {
+var isAnAdmin = function (request, reply, callback) {
 
     /* This is just for example purposes.  You would need your own logic here. */
     var admin = request.query.admin || false;
