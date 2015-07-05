@@ -1,4 +1,4 @@
-var incorrectApplyPoint = function(request, reply, callback) {
+var incorrectApplyPoint = function (request, reply, callback) {
 
     callback(null, false, 'custom');
 };

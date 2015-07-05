@@ -1,4 +1,4 @@
-var customMessage = function(request, reply, callback) {
+var customMessage = function (request, reply, callback) {
 
     callback(null, false, 'custom');
 };

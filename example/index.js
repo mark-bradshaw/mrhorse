@@ -14,7 +14,7 @@ server.register({
             policyDirectory: __dirname + '/policies'
         }
     },
-    function(err) {
+    function (err) {
 
         if (err) {
             return console.log(err);
@@ -26,7 +26,7 @@ server.register({
         register: require('./another_plugin'),
         options: {}
     },
-    function(err) {
+    function (err) {
 
         if (err) {
             return console.log(err);
@@ -37,7 +37,7 @@ server.register({
 server.route({
     method: 'GET',
     path: '/',
-    handler: function(request, reply) {
+    handler: function (request, reply) {
 
         reply('MrHorse <a href="https://github.com/mark-bradshaw/mrhorse"></a>' +
             '<br />Try these:' +
@@ -59,7 +59,7 @@ http://localhost:3000/loggedin?loggedin=true
 server.route({
     method: 'GET',
     path: '/loggedin',
-    handler: function(request, reply) {
+    handler: function (request, reply) {
 
         reply('You are logged in.');
     },
@@ -78,7 +78,7 @@ http://localhost:3000/admin?loggedin=true&admin=true
 server.route({
     method: 'GET',
     path: '/admin',
-    handler: function(request, reply) {
+    handler: function (request, reply) {
 
         reply('You are logged in AND an admin.');
     },
@@ -95,7 +95,7 @@ Try http://localhost:3000/addanalytics
 server.route({
     method: 'GET',
     path: '/addanalytics',
-    handler: function(request, reply) {
+    handler: function (request, reply) {
 
         reply({
             data: 'this could be cached'
@@ -108,7 +108,7 @@ server.route({
     }
 });
 
-server.start(function(err) {
+server.start(function (err) {
 
     console.log('Server started at: ' + server.info.uri);
 });

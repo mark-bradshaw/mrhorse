@@ -1,4 +1,5 @@
-var passes = function(request, reply, callback) {
+var passes = function (request, reply, callback) {
+
     callback(null, true);
 };
 
