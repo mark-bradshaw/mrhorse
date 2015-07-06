@@ -106,8 +106,29 @@ lab.experiment('Non standard setups', function (done) {
 
             done();
         });
-    })
+    });
 
+    lab.test('asserts on invalid defaultApplyPoint option.', function(done) {
+        
+        var registration = function() {
+            server.register({
+                register: require('..'),
+                options : {
+                    policyDirectory: __dirname + '/policies',
+                    defaultApplyPoint: 'onIncorrect'
+                }
+            }, function(err) {
+
+                if (err) {
+                    console.error(err);
+                }
+            });
+        };
+        
+        Code.expect(registration).to.throw(Error, 'Specified invalid defaultApplyPoint: onIncorrect');
+        done();
+    });
+    
     lab.test('incorrect applyPoint', function (done) {
 
         // pull this bad policy in to the policies folder.
@@ -147,7 +168,12 @@ lab.experiment('Normal setup', function (done) {
 
     lab.beforeEach(function (done) {
 
-        server = new Hapi.Server();
+        server = new Hapi.Server({
+            debug: {
+                request: false
+            }
+        });
+        
         server.connection({
             port: 1234
         });
@@ -280,6 +306,66 @@ lab.experiment('Normal setup', function (done) {
             }
         });
 
+        server.route({
+            method : 'GET',
+            path   : '/policy-as-function-passes',
+            handler: function (request, reply) {
+
+                reply('ok');
+            },
+            config : {
+                plugins: {
+                    policies: [require('./policies/passes')]
+                }
+            }
+        });
+
+        server.route({
+            method : 'GET',
+            path   : '/policy-as-function-bad-applypoint',
+            handler: function (request, reply) {
+
+                reply('ok');
+            },
+            config : {
+                plugins: {
+                    policies: [require('./fixtures/incorrectApplyPoint')]
+                }
+            }
+        });
+
+        server.route({
+            method : 'GET',
+            path   : '/policy-as-function-posthandler',
+            handler: function (request, reply) {
+
+                reply({
+                    handler: 'handler'
+                });
+            },
+            config : {
+                plugins: {
+                    policies: [require('./policies/postHandler')]
+                }
+            }
+        });
+
+        server.route({
+            method : 'GET',
+            path   : '/policy-bad-type',
+            handler: function (request, reply) {
+
+                reply({
+                    handler: 'handler'
+                });
+            },
+            config : {
+                plugins: {
+                    policies: [{object: 'invalidPlainObject'}]
+                }
+            }
+        });
+
         server.register({
             register: require('..'),
             options : {
@@ -407,4 +493,69 @@ lab.experiment('Normal setup', function (done) {
             done();
         });
     });
+
+    lab.test('runs policy as function', function (done) {
+
+        server.inject('/policy-as-function-passes', function (res) {
+
+            Code.expect(res.result).to.equal('ok');
+            done();
+        });
+    });
+    
+    lab.test('implementation error on policy as function with bad applyPoint', function (done) {
+
+        var requestError;
+        
+        var setRequestError = function (request, err) {
+        
+            requestError = err;
+        }
+        
+        server.on('request-error', setRequestError);
+
+        server.inject('/policy-as-function-bad-applypoint', function (res) {
+            
+            server.removeListener('request-error', setRequestError);
+
+            Code.expect(res.statusCode).to.equal(500);
+            Code.expect(requestError).to.be.an.instanceof(Error);
+            Code.expect(requestError.message).to.equal('Trying to use incorrect applyPoint for the dynamic policy: onIncorrect');
+            done();
+        });
+    });
+    
+    lab.test('runs policy as function with explicit applyPoint', function (done) {
+
+        server.inject('/policy-as-function-posthandler', function (res) {
+
+            Code.expect(res.statusCode).to.equal(200);
+            Code.expect(res.result.added).to.equal('this');
+            done();
+        });
+        
+    });
+    
+    lab.test('implementation error on policy not specified as string or function', function (done) {
+
+        var requestError;
+        
+        var setRequestError = function (request, err) {
+        
+            requestError = err;
+        }
+        
+        server.on('request-error', setRequestError);
+
+        server.inject('/policy-bad-type', function (res) {
+            
+            server.removeListener('request-error', setRequestError);
+
+            Code.expect(res.statusCode).to.equal(500);
+            Code.expect(requestError).to.be.an.instanceof(Error);
+            Code.expect(requestError.message).to.equal('Policy not specified by name or by function.');
+            done();
+        });
+    });
+    
 });
