@@ -170,7 +170,7 @@ lab.experiment('Normal setup', function (done) {
 
         server = new Hapi.Server({
             debug: {
-                request: false
+                request: false // we don't need to see tested implementation errors in console.
             }
         });
         
