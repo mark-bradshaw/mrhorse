@@ -1,4 +1,5 @@
-var redirects = function(request, reply, callback) {
+var redirects = function (request, reply, callback) {
+
     callback(reply.redirect('/'), false);
 };
 

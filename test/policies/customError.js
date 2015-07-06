@@ -1,6 +1,6 @@
 var Boom = require('boom');
 
-var customFail = function(request, reply, callback) {
+var customFail = function (request, reply, callback) {
 
     callback(Boom.notFound());
 };
