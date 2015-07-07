@@ -314,7 +314,7 @@ lab.experiment('Normal setup', function (done) {
             },
             config : {
                 plugins: {
-                    policies: [require('./policies/passes')]
+                    policies: [ require('./policies/passes') ]
                 }
             }
         });
@@ -328,7 +328,7 @@ lab.experiment('Normal setup', function (done) {
             },
             config : {
                 plugins: {
-                    policies: [require('./fixtures/incorrectApplyPoint')]
+                    policies: [ require('./fixtures/incorrectApplyPoint') ]
                 }
             }
         });
@@ -344,7 +344,7 @@ lab.experiment('Normal setup', function (done) {
             },
             config : {
                 plugins: {
-                    policies: [require('./policies/postHandler')]
+                    policies: [ require('./policies/postHandler') ]
                 }
             }
         });
@@ -360,7 +360,7 @@ lab.experiment('Normal setup', function (done) {
             },
             config : {
                 plugins: {
-                    policies: [{object: 'invalidPlainObject'}]
+                    policies: [ {object: 'invalidPlainObject'} ]
                 }
             }
         });
@@ -376,7 +376,7 @@ lab.experiment('Normal setup', function (done) {
             },
             config : {
                 plugins: {
-                    policies: [MrHorse.parallel('postHandler', 'postHandlerAnother')]
+                    policies: [ MrHorse.parallel('postHandler', 'postHandlerAnother') ]
                 }
             }
         });
@@ -392,7 +392,7 @@ lab.experiment('Normal setup', function (done) {
             },
             config : {
                 plugins: {
-                    policies: [MrHorse.parallel('passes', 'fails')]
+                    policies: [ MrHorse.parallel('passes', 'fails') ]
                 }
             }
         });
@@ -408,7 +408,7 @@ lab.experiment('Normal setup', function (done) {
             },
             config : {
                 plugins: {
-                    policies: [MrHorse.parallel('customError', 'passes')]
+                    policies: [ MrHorse.parallel('customError', 'passes') ]
                 }
             }
         });
@@ -424,7 +424,7 @@ lab.experiment('Normal setup', function (done) {
             },
             config : {
                 plugins: {
-                    policies: [MrHorse.parallel('passes', 'timedCustomMessageLate', 'timedCustomMessageEarly')]
+                    policies: [ MrHorse.parallel('passes', 'timedCustomMessageLate', 'timedCustomMessageEarly') ]
                 }
             }
         });
@@ -452,6 +452,24 @@ lab.experiment('Normal setup', function (done) {
             }
         });
 
+        server.route({
+            method : 'GET',
+            path   : '/parallel-as-array',
+            handler: function (request, reply) {
+
+                reply({
+                    handler: 'handler'
+                });
+            },
+            config : {
+                plugins: {
+                    policies: [
+                        ['postHandler', 'postHandlerAnother']
+                    ]
+                }
+            }
+        });
+        
         server.register({
             register: MrHorse,
             options : {
@@ -693,5 +711,16 @@ lab.experiment('Normal setup', function (done) {
             done();
         });
     });
-    
+
+    lab.test('parallel aggregate policy runs multiple policies when specified in array format', function (done) {
+
+        server.inject('/parallel-as-array', function (res) {
+            
+            Code.expect(res.statusCode).to.equal(200);
+            Code.expect(res.result.added).to.equal('this');
+            Code.expect(res.result.addedAnother).to.equal('that');
+            done();
+        });
+    });
+
 });
