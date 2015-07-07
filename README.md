@@ -223,3 +223,81 @@ var routes = [
    }
 ];
 ```
+##### Specifying policies dynamically as functions
+
+In the `config.plugins.policies` array you can also include raw policy functions.
+```javascript
+var isAdminPolicy = function isAdmin (request, reply, next) {
+    
+    if (hasAdminAccess(request)) {
+        next(null, true);
+    } else {
+        next(null, false)
+    }
+};
+
+isAdminPolicy.applyPoint = 'onPreHandler';
+
+var routes = [
+   {
+       method: 'your_method',
+       path: '/your/path/here',
+       handler: your_route_handler,
+       config: {
+           plugins: {
+               policies: [ isAdminPolicy ]
+           }
+       }
+   }
+];
+```
+
+##### Running policies in parallel
+If you'd like to run policies in parallel, you can specify a list of loaded policies in parentheses or explicitly as arguments to `MrHorse.parallel`.
+When policies are run in parallel, expect all policies to complete.  If any of the policies specify an error or `Forbidden 403` message, by default the first listed policy with such an error will be given precedence.
+
+```javascript
+var routes = [
+   {
+       method: 'your_method',
+       path: '/your/path/here',
+       handler: your_route_handler,
+       config: {
+           plugins: {
+               policies: [
+                    ['isAdmin', 'smellsGood']
+                ]
+           }
+       }
+   }
+];
+```
+or equivalently,
+```javascript
+var MrHorse = require('mrhorse');
+
+var routes = [
+   {
+       method: 'your_method',
+       path: '/your/path/here',
+       handler: your_route_handler,
+       config: {
+           plugins: {
+               policies: [
+                    MrHorse.parallel('isAdmin', 'smellsGood')
+                ]
+           }
+       }
+   }
+];
+```
+
+`MrHorse.parallel` optionally accepts a custom error handler as its final argument.  This may be used to aggregate errors from multiple policies into a single custom error or message.  The function signature of this function is `next(ranPolicies, results, next)`,
+
+ - `ranPolicies` is an array of the names of the policies that were run, with original listed order maintained.
+ - `results` is an object whose keys are the names of the listed policies that ran, and whose values are objects of the format,
+   - `err` a custom error passed to the pertinent policy's `next` callback.
+   - `canContinue` the boolean value passed to the pertinent policy's `next` callback, deciding if the policy passed or failed.
+   - `message` the custom error message passed to the pertinent policy's `next` callback, intended to become part of a `403 Forbidden` error.
+ - `next(err, canContinue, message)` is the final callback for the policy.  This behaves the same as a standard policy's `next` callback, accepting a custom `err`, a `canContinue` boolean, and a custom `message` as arguments.
+   
