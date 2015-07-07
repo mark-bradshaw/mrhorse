@@ -253,7 +253,7 @@ var routes = [
 ```
 
 ##### Running policies in parallel
-If you'd like to run policies in parallel, you can specify a list of loaded policies in parentheses or explicitly as arguments to `MrHorse.parallel`.
+If you'd like to run policies in parallel, you can specify a list of loaded policies as an array or as individual arguments to `MrHorse.parallel`.
 When policies are run in parallel, expect all policies to complete.  If any of the policies specify an error or `Forbidden 403` message, by default the first listed policy with such an error will be given precedence.
 
 ```javascript
@@ -292,7 +292,7 @@ var routes = [
 ];
 ```
 
-`MrHorse.parallel` optionally accepts a custom error handler as its final argument.  This may be used to aggregate errors from multiple policies into a single custom error or message.  The function signature of this function is `next(ranPolicies, results, next)`,
+`MrHorse.parallel` optionally accepts a custom error handler as its final argument.  This may be used to aggregate errors from multiple policies into a single custom error or message.  The function signature of this function is `next(ranPolicies, results, next)`.
 
  - `ranPolicies` is an array of the names of the policies that were run, with original listed order maintained.
  - `results` is an object whose keys are the names of the listed policies that ran, and whose values are objects of the format,
