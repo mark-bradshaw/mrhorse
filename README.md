@@ -33,7 +33,10 @@ server.route({
     handler: function(request, reply) {},
     config: {
         plugins: {
-            policies: ['isLoggedIn', 'isAnAdmin', 'onlyInUS']
+            policies: [
+                ['isLoggedIn', 'isAnAdmin'], // Do these two in parallel
+                'onlyInUS'
+            ]
         }
     }
 });
