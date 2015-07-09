@@ -1,12 +1,12 @@
 ## MrHorse
 
-[![Join the chat at https://gitter.im/mark-bradshaw/mrhorse](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mark-bradshaw/mrhorse?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 Manage your [**hapi**](https://github.com/hapijs/hapi) routes with modular policies.
 
 Lead Maintainer: [Mark Bradshaw](https://github.com/mark-bradshaw), [contributors](CONTRIBUTORS.md)
 
 [![Build Status](https://travis-ci.org/mark-bradshaw/mrhorse.svg?branch=master)](https://travis-ci.org/mark-bradshaw/mrhorse) [![Coverage Status](https://img.shields.io/coveralls/mark-bradshaw/mrhorse.svg)](https://coveralls.io/r/mark-bradshaw/mrhorse) [![Dependencies Up To Date](https://david-dm.org/mark-bradshaw/mrhorse.svg?style=flat)](https://david-dm.org/mark-bradshaw/mrhorse)
+
+[![Join the chat at https://gitter.im/mark-bradshaw/mrhorse](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mark-bradshaw/mrhorse?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ### What is it?
 
