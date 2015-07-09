@@ -1,5 +1,7 @@
 ## MrHorse
 
+[![Join the chat at https://gitter.im/mark-bradshaw/mrhorse](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mark-bradshaw/mrhorse?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Manage your [**hapi**](https://github.com/hapijs/hapi) routes with modular policies.
 
 Lead Maintainer: [Mark Bradshaw](https://github.com/mark-bradshaw), [contributors](CONTRIBUTORS.md)
