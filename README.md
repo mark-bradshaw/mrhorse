@@ -269,7 +269,7 @@ var hasRole = function(roleName) {
     hasSpecificRole.applyPoint = 'onPreHandler';
     
     return hasSpecificRole;
-}
+};
 
 var routes = [
    {
