@@ -1,13 +1,12 @@
 /* eslint-disable */
 
+var MrHorse = require('..');
 var Code = require('code');
 var fs = require('fs');
 var Hapi = require('hapi');
 var Lab = require('lab');
 var lab = exports.lab = Lab.script();
 var util = require('util');
-
-var mrhorse = require('..');
 
 var request = {
     route: {
@@ -42,7 +41,7 @@ lab.experiment('Non standard setups', function (done) {
     lab.test('can register without a policy directory', function (done) {
 
         server.register({
-                register: require('..'),
+                register: MrHorse,
                 options: {}
             },
             function () {
@@ -63,7 +62,7 @@ lab.experiment('Non standard setups', function (done) {
         }
 
         server.register({
-                register: require('..'),
+                register: MrHorse,
                 options: {
                     policyDirectory: __dirname + '/emptypolicies'
                 }
@@ -88,7 +87,7 @@ lab.experiment('Non standard setups', function (done) {
     lab.test('accepts an alternate default apply point', function(done) {
 
         server.register({
-            register: require('..'),
+            register: MrHorse,
             options : {
                 policyDirectory: __dirname + '/policies',
                 defaultApplyPoint: 'onPostHandler'
@@ -100,7 +99,7 @@ lab.experiment('Non standard setups', function (done) {
             }
 
             Code.expect(server.plugins.mrhorse.data.setHandlers.onPostHandler).to.equal(true);
-            Code.expect(Object.keys(server.plugins.mrhorse.data.onPostHandler).length).to.equal(7);
+            Code.expect(Object.keys(server.plugins.mrhorse.data.onPostHandler).length).to.equal(10);
 
             server.plugins.mrhorse.reset();
 
@@ -112,7 +111,7 @@ lab.experiment('Non standard setups', function (done) {
         
         var registration = function() {
             server.register({
-                register: require('..'),
+                register: MrHorse,
                 options : {
                     policyDirectory: __dirname + '/policies',
                     defaultApplyPoint: 'onIncorrect'
@@ -140,7 +139,7 @@ lab.experiment('Non standard setups', function (done) {
         }
 
         server.register({
-                register: require('..'),
+                register: MrHorse,
                 options : {
                     policyDirectory: __dirname + '/incorrect-policies'
                 }
@@ -315,7 +314,7 @@ lab.experiment('Normal setup', function (done) {
             },
             config : {
                 plugins: {
-                    policies: [require('./policies/passes')]
+                    policies: [ require('./policies/passes') ]
                 }
             }
         });
@@ -329,7 +328,7 @@ lab.experiment('Normal setup', function (done) {
             },
             config : {
                 plugins: {
-                    policies: [require('./fixtures/incorrectApplyPoint')]
+                    policies: [ require('./fixtures/incorrectApplyPoint') ]
                 }
             }
         });
@@ -345,7 +344,7 @@ lab.experiment('Normal setup', function (done) {
             },
             config : {
                 plugins: {
-                    policies: [require('./policies/postHandler')]
+                    policies: [ require('./policies/postHandler') ]
                 }
             }
         });
@@ -361,13 +360,118 @@ lab.experiment('Normal setup', function (done) {
             },
             config : {
                 plugins: {
-                    policies: [{object: 'invalidPlainObject'}]
+                    policies: [ {object: 'invalidPlainObject'} ]
                 }
             }
         });
 
+        server.route({
+            method : 'GET',
+            path   : '/parallel-ok',
+            handler: function (request, reply) {
+
+                reply({
+                    handler: 'handler'
+                });
+            },
+            config : {
+                plugins: {
+                    policies: [ MrHorse.parallel('postHandler', 'postHandlerAnother') ]
+                }
+            }
+        });
+
+        server.route({
+            method : 'GET',
+            path   : '/parallel-fails',
+            handler: function (request, reply) {
+
+                reply({
+                    handler: 'handler'
+                });
+            },
+            config : {
+                plugins: {
+                    policies: [ MrHorse.parallel('passes', 'fails') ]
+                }
+            }
+        });
+
+        server.route({
+            method : 'GET',
+            path   : '/parallel-custom-error',
+            handler: function (request, reply) {
+
+                reply({
+                    handler: 'handler'
+                });
+            },
+            config : {
+                plugins: {
+                    policies: [ MrHorse.parallel('customError', 'passes') ]
+                }
+            }
+        });
+
+        server.route({
+            method : 'GET',
+            path   : '/parallel-default-handler',
+            handler: function (request, reply) {
+
+                reply({
+                    handler: 'handler'
+                });
+            },
+            config : {
+                plugins: {
+                    policies: [ MrHorse.parallel('passes', 'timedCustomMessageLate', 'timedCustomMessageEarly') ]
+                }
+            }
+        });
+
+        server.route({
+            method : 'GET',
+            path   : '/parallel-custom-handler',
+            handler: function (request, reply) {
+
+                reply({
+                    handler: 'handler'
+                });
+            },
+            config : {
+                plugins: {
+                    policies: [
+                        MrHorse.parallel('passes', 'customMessage',
+                        function (policyNames, results, next) {
+                            
+                            var transformedMessage = results.customMessage.message + ' and transformed';
+                            next(null, false, transformedMessage);
+                        })
+                    ]
+                }
+            }
+        });
+
+        server.route({
+            method : 'GET',
+            path   : '/parallel-as-array',
+            handler: function (request, reply) {
+
+                reply({
+                    handler: 'handler'
+                });
+            },
+            config : {
+                plugins: {
+                    policies: [
+                        ['postHandler', 'postHandlerAnother']
+                    ]
+                }
+            }
+        });
+        
         server.register({
-            register: require('..'),
+            register: MrHorse,
             options : {
                 policyDirectory: __dirname + '/policies',
                 defaultApplyPoint: 'onPreHandler'
@@ -558,4 +662,65 @@ lab.experiment('Normal setup', function (done) {
         });
     });
     
+    lab.test('parallel aggregate policy runs multiple policies', function (done) {
+
+        server.inject('/parallel-ok', function (res) {
+            
+            Code.expect(res.statusCode).to.equal(200);
+            Code.expect(res.result.added).to.equal('this');
+            Code.expect(res.result.addedAnother).to.equal('that');
+            done();
+        });
+    });
+    
+    lab.test('parallel aggregate policy fails if one policy fails', function (done) {
+
+        server.inject('/parallel-fails', function (res) {
+            
+            Code.expect(res.statusCode).to.equal(403);
+            Code.expect(res.result.error).to.equal('Forbidden');
+            done();
+        });
+    });
+
+    lab.test('parallel aggregate policy respects custom error responses', function (done) {
+
+        server.inject('/parallel-custom-error', function (res) {
+            
+            Code.expect(res.statusCode).to.equal(404);
+            done();
+        });
+    });
+
+    lab.test('parallel aggregate policy default error handler fails with error prioritized by listed policy order.', function (done) {
+
+        server.inject('/parallel-default-handler', function (res) {
+            
+            Code.expect(res.statusCode).to.equal(403);
+            Code.expect(res.result.message).to.equal('custom late');
+            done();
+        });
+    });
+
+    lab.test('parallel aggregate policy accepts custom error handler.', function (done) {
+
+        server.inject('/parallel-custom-handler', function (res) {
+            
+            Code.expect(res.statusCode).to.equal(403);
+            Code.expect(res.result.message).to.equal('custom and transformed');
+            done();
+        });
+    });
+
+    lab.test('parallel aggregate policy runs multiple policies when specified in array format', function (done) {
+
+        server.inject('/parallel-as-array', function (res) {
+            
+            Code.expect(res.statusCode).to.equal(200);
+            Code.expect(res.result.added).to.equal('this');
+            Code.expect(res.result.addedAnother).to.equal('that');
+            done();
+        });
+    });
+
 });

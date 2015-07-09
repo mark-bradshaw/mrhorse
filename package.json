@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/mark-bradshaw/mrhorse",
   "dependencies": {
-    "async": "^1.3.0",
+    "items": "^1.1.0",
     "boom": "^2.8.0",
     "hoek": "^2.14.0",
     "lodash": "^3.10.0"

@@ -225,3 +225,115 @@ var routes = [
    }
 ];
 ```
+##### Specifying policies dynamically as functions
+
+In the `config.plugins.policies` array you can also include raw policy functions.
+```javascript
+var isAdminPolicy = function isAdmin (request, reply, next) {
+    
+    if (hasAdminAccess(request)) {
+        next(null, true);
+    } else {
+        next(null, false);
+    }
+};
+
+isAdminPolicy.applyPoint = 'onPreHandler';
+
+var routes = [
+   {
+       method: 'your_method',
+       path: '/your/path/here',
+       handler: your_route_handler,
+       config: {
+           plugins: {
+               policies: [ isAdminPolicy ]
+           }
+       }
+   }
+];
+```
+
+This can be used with currying to great effect.
+```javascript
+
+var hasRole = function(roleName) {
+
+    var hasSpecificRole = function hasSpecificRole (request, reply, next) {
+        
+        if (hasRole(request, roleName)) {
+            next(null, true);
+        } else {
+            next(null, false);
+        }
+    };
+    
+    hasSpecificRole.applyPoint = 'onPreHandler';
+    
+    return hasSpecificRole;
+};
+
+var routes = [
+   {
+       method: 'your_method',
+       path: '/your/path/here',
+       handler: your_route_handler,
+       config: {
+           plugins: {
+               policies: [ hasRole('user') ]
+           }
+       }
+   }
+];
+```
+
+##### Running policies in parallel
+If you'd like to run policies in parallel, you can specify a list of loaded policies' names as an array or as individual arguments to `MrHorse.parallel`.
+When policies are run in parallel, expect all policies to complete.  If any of the policies specify an error or `Forbidden 403` message, the error response from the left-most policy will be returned to the browser.
+
+```javascript
+var routes = [
+   {
+       method: 'your_method',
+       path: '/your/path/here',
+       handler: your_route_handler,
+       config: {
+           plugins: {
+               policies: [
+                    'isFarmer',
+                    ['eatsFruit', 'eatsVegetables']
+                ]
+           }
+       }
+   }
+];
+```
+or equivalently,
+```javascript
+var MrHorse = require('mrhorse');
+
+var routes = [
+   {
+       method: 'your_method',
+       path: '/your/path/here',
+       handler: your_route_handler,
+       config: {
+           plugins: {
+               policies: [
+                    'isFarmer',
+                    MrHorse.parallel('eatsFruit', 'eatsVegetables')
+                ]
+           }
+       }
+   }
+];
+```
+
+`MrHorse.parallel` optionally accepts a custom error handler as its final argument.  This may be used to aggregate errors from multiple policies into a single custom error or message.  The signature of this function is `handler(ranPolicies, results, next)`.
+
+ - `ranPolicies` is an array of the names of the policies that were run, with original listed order maintained.
+ - `results` is an object whose keys are the names of the individual listed policies that ran, and whose values are objects of the format,
+   - `err:` a custom error passed to the pertinent policy's `next` callback.
+   - `canContinue:` the boolean value passed to the pertinent policy's `next` callback, deciding if the policy passed or failed.
+   - `message:` the custom error message passed to the pertinent policy's `next` callback, intended to become part of a `403 Forbidden` error.
+ - `next(err, canContinue, message)` is the final callback for the aggregate policy.  This behaves the same as a standard policy's `next` callback, accepting a custom `err`, a `canContinue` boolean, and a custom `message` as arguments.
