@@ -12,7 +12,7 @@ var moonInPhase = function (request, reply, next) {
             return next(Boom.badImplementation(), false);
         }
 
-        if (payload[0].Phase !== 'Waning Crescent') {
+        if (payload[0].Phase !== 'Waning Cresent') {
             
             return next(null, false, payload[0].Phase + ' is the wrong moon phase for admin night.');
         }
