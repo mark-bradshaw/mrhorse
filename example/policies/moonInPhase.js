@@ -3,8 +3,7 @@ var Boom  = require('boom');
 
 var moonInPhase = function (request, reply, next) {
  
-    var now = (new Date()).getTime();
-    var timestamp = parseInt(now / 1000);
+    var timestamp = parseInt(Date.now() / 1000);
     
     Wreck.get('http://api.farmsense.net/v1/moonphases/?d=' + timestamp, { json: 'force' }, function (err, res, payload) {
 
