@@ -114,7 +114,7 @@ Try http://localhost:3000/adminnight, and
 http://localhost:3000/adminnight?loggedin=true, and
 http://localhost:3000/adminnight?loggedin=true&admin=true
 
-Then try them again (with an internet connection) on a night when the moon is a waxing crescent.
+Then try them again (with an internet connection) on a night when the moon is a waning crescent.
  */
 server.route({
     method: 'GET',
