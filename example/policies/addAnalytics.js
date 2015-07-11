@@ -8,7 +8,6 @@ var addAnalytics = function (request, reply, callback) {
     callback(null, true);
 };
 
-addAnalytics.pre = false;
-addAnalytics.post = true;
+addAnalytics.applyPoint = 'onPostHandler';
 
 module.exports = addAnalytics;
