@@ -93,9 +93,9 @@ server.plugins.mrhorse.loadPolicies(server, {
     });
 ```
 
-The difference is that going forward all options to loadPolicies function will be sent in a container object.
+Going forward all options to loadPolicies function will be sent in a container object.
 
-* If you were using the ```post``` configuration option in our policy, like:
+* If you were using the ```post``` configuration option in your policy, like:
 ```javascript
 var policy = function(request, reply, next) {
    ... your policy code
