@@ -56,9 +56,9 @@ Using policies you can easily mix and match your business logic into your routes
 Hapi provides a somewhat similar mechanism for doing things before a route handler is executed, called route prerequisites.  MrHorse seems to be overlapping this functionality, so why not just use prerequisites?
 
 1. MrHorse puts more focus on whether to continue on to the next policy, allowing you to more easily short circuit a request and skip other policies or the route handler.  This makes authentication and authorization tasks more straightforward.  Since you can stop processing with any policy, it allows you to fail quickly and early, and avoid later processing.
-1. MrHorse gives you the option of running policies at any point in the request life cycle, including **after** a request handler has run.  This allows you to easily modify responses, add additional data, or do logging tasks and still run your normal handler.  With prerequisites, you can take over a response, but your route handler won't get run.  It gives you no ability to do additional processing post handler.
+1. MrHorse gives you the option of running policies at any point in the [Hapi request life cycle](http://hapijs.com/api#request-lifecycle), including **after** a request handler has run.  This allows you to easily modify responses, add additional data, or do logging tasks and still run your normal handler.  With prerequisites, you can take over a response, but your route handler won't get run.  It gives you no ability to do additional processing post handler.
 1. MrHorse helps you to keep your policy type code in a central location, and loads it up for you.  Prerequisites don't provide any help with this.
-1. MrHorse can allow policies to run at even more places in the request life cycle than just right before the handler.  This is a flexibility that prerequisites probably will never have.
+1. MrHorse can allow policies to run at even more places in the [Hapi request life cycle](http://hapijs.com/api#request-lifecycle) than just right before the handler.  This is a flexibility that prerequisites probably will never have.
 
 
 ### Examples
@@ -153,7 +153,7 @@ Both strategies are fine, and can be complementary.  If your hapi project uses p
 
 You can use mrhorse in as many places as you want.  It's ok to have multiple policies folders in different locations, and tell mrhorse to look in each one.  The only requirement is that each policy file name **must** be globally unique.
 
-By default policies are applied at the `onPreHandler` event in the request lifecycle if no other event is specified in the policy.  Each policy can control which event to apply at.  You can also change the default event to whatever you want.  You would do this by passing in `defaultApplyPoint` in the options object when registering the plugin, like this:
+By default policies are applied at the `onPreHandler` event in the [Hapi request life cycle](http://hapijs.com/api#request-lifecycle) if no other event is specified in the policy.  Each policy can control which event to apply at.  You can also change the default event to whatever you want.  You would do this by passing in `defaultApplyPoint` in the options object when registering the plugin, like this:
 
 ```javascript
 server.register({
@@ -197,7 +197,7 @@ You can also provide a custom message as a third parameter [`next(null, false, '
 
 If your policy has nothing to do with authentication or authorization, you will just want to respond back with true to continue normal processing of the request [`next(null, true)`].
 
-By default all policies are assumed to be pre-handlers unless you specify otherwise.  You can, however, choose to run a policy at any point in the request life cycle by specifying one of the event names that Hapi provides.  If you would like additional information about events are called in the Hapi request life cycle, please refer to the [Hapi documentation](http://hapijs.com/api#request-lifecycle).
+By default all policies are assumed to be pre-handlers unless you specify otherwise.  You can, however, choose to run a policy at any point in the [Hapi request life cycle](http://hapijs.com/api#request-lifecycle) by specifying one of the event names that Hapi provides.  If you would like additional information about events are called in the Hapi request life cycle, please refer to the [Hapi documentation](http://hapijs.com/api#request-lifecycle).
 
 The events in the life cycle are:
 
