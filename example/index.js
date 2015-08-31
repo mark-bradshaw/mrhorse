@@ -46,7 +46,7 @@ server.route({
             '<br /><a href="/admin">http://localhost:3000/admin</a> - This will give a 403' +
             '<br /><a href="/admin?loggedin=true">http://localhost:3000/admin?loggedin=true</a> - This will give a 403 with a special message' +
             '<br /><a href="/admin?loggedin=true&admin=true">http://localhost:3000/admin?loggedin=true&admin=true</a> - mixing multiple policies' +
-            '<br /><a href="/adminnight?loggedin=true&admin=true">http://localhost:3000/adminnight?loggedin=true&admin=true</a> - using parallel policies' +
+            '<br /><a href="/adminnight?loggedin=true&admin=true">http://localhost:3000/adminnight?loggedin=true&admin=true</a> - using parallel policies.  this might 403 depending on the phase of the moon.  seriously.' +
             '<br /><a href="/addanalytics">http://localhost:3000/addanalytics</a> - Part of this JSON data is injected in a post handler' +
             '<br /><a href="/otherplugin">http://localhost:3000/otherplugin</a> - This route comes from a plugin, which can also use Mr Horse.  This will give a 403.' +
             '<br /><a href="/otherplugin?loggedin=true">http://localhost:3000/otherplugin?loggedin=true</a> - Here is that route, logged in');
