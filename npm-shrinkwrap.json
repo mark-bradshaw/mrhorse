@@ -4,23 +4,23 @@
   "dependencies": {
     "boom": {
       "version": "2.8.0",
-      "from": "boom@2.8.0",
+      "from": "boom@",
       "resolved": "https://registry.npmjs.org/boom/-/boom-2.8.0.tgz"
     },
     "hoek": {
       "version": "2.14.0",
-      "from": "hoek@2.14.0",
+      "from": "hoek@",
       "resolved": "https://registry.npmjs.org/hoek/-/hoek-2.14.0.tgz"
     },
     "items": {
       "version": "1.1.0",
-      "from": "https://registry.npmjs.org/items/-/items-1.1.0.tgz",
+      "from": "items@",
       "resolved": "https://registry.npmjs.org/items/-/items-1.1.0.tgz"
     },
     "lodash": {
-      "version": "3.10.0",
-      "from": "lodash@3.10.0",
-      "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.10.0.tgz"
+      "version": "3.10.1",
+      "from": "lodash@",
+      "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.10.1.tgz"
     }
   }
 }
