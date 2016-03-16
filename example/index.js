@@ -1,20 +1,21 @@
 'use strict';
 
-var Hapi = require('hapi');
+const Hapi = require('hapi');
 
-var server = new Hapi.Server();
+const server = new Hapi.Server();
 server.connection({
     port: 3000
 });
 
 /* Register the MrHorse Plugin, and feed it an initial list of policies */
-server.register({
+server.register(
+    {
         register: require('..'),
         options: {
             policyDirectory: __dirname + '/policies'
         }
     },
-    function (err) {
+    (err) => {
 
         if (err) {
             return console.log(err);
@@ -22,11 +23,12 @@ server.register({
     });
 
 /* Register another plugin to show how Mr Horse is used by other plugins. */
-server.register({
+server.register(
+    {
         register: require('./another_plugin'),
         options: {}
     },
-    function (err) {
+    (err) => {
 
         if (err) {
             return console.log(err);
@@ -119,7 +121,7 @@ Then try them again (with an internet connection) on a night when the moon is a 
 server.route({
     method: 'GET',
     path: '/adminnight',
-    handler: function (request, reply) {
+    handler: (request, reply) => {
 
         reply('You are logged in AND an admin AND the moon is in phase.');
     },
@@ -134,7 +136,10 @@ server.route({
 });
 
 
-server.start(function (err) {
+server.start((err) => {
 
+    if (err) {
+        console.log(err);
+    }
     console.log('Server started at: ' + server.info.uri);
 });
