@@ -26,8 +26,8 @@
   "dependencies": {
     "boom": "3.1.x",
     "hoek": "3.0.x",
-    "items": "1.1.0",
-    "lodash": "3.10.1"
+    "items": "^2.0.0",
+    "lodash": "^4.6.1"
   },
   "devDependencies": {
     "code": "2.1.x",
