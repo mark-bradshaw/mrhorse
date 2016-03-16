@@ -1,4 +1,6 @@
-var postHandler = function (request, reply, callback) {
+'use strict';
+
+const postHandler = function (request, reply, callback) {
 
     request.response.source.added = 'this';
     callback(null, true);

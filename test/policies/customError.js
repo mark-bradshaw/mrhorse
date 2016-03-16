@@ -1,6 +1,8 @@
-var Boom = require('boom');
+'use strict';
 
-var customFail = function (request, reply, callback) {
+const Boom = require('boom');
+
+const customFail = function (request, reply, callback) {
 
     callback(Boom.notFound());
 };

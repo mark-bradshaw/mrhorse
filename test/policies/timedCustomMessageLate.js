@@ -1,6 +1,8 @@
-var timedCustomMessageLate = function (request, reply, callback) {
+'use strict';
 
-    setTimeout(function () {
+const timedCustomMessageLate = function (request, reply, callback) {
+
+    setTimeout(() => {
 
         callback(null, false, 'custom late');
     }, 50);

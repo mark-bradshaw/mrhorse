@@ -1,4 +1,6 @@
-var redirects = function (request, reply, callback) {
+'use strict';
+
+const redirects = function (request, reply, callback) {
 
     callback(reply.redirect('/'), false);
 };
