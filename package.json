@@ -22,15 +22,15 @@
   "homepage": "https://github.com/mark-bradshaw/mrhorse",
   "dependencies": {
     "boom": "3.1.x",
-    "hoek": "2.14.0",
+    "hoek": "3.0.x",
     "items": "1.1.0",
     "lodash": "3.10.1"
   },
   "devDependencies": {
-    "code": "^1.5.0",
+    "code": "2.1.x",
     "coveralls": "^2.11.4",
     "hapi": "13.x.x",
-    "lab": "^5.15.2",
-    "wreck": "^6.2.0"
+    "lab": "10.3.0",
+    "wreck": "7.0.x"
   }
 }
