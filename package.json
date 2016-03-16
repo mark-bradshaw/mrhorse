@@ -31,7 +31,7 @@
   },
   "devDependencies": {
     "code": "2.1.x",
-    "coveralls": "^2.11.4",
+    "coveralls": "^2.11.8",
     "hapi": "13.x.x",
     "lab": "10.3.0",
     "wreck": "7.0.x"
