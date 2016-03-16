@@ -1,4 +1,6 @@
-var incorrectApplyPoint = function (request, reply, callback) {
+'use strict';
+
+const incorrectApplyPoint = function (request, reply, callback) {
 
     callback(null, false, 'custom');
 };

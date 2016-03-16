@@ -4,7 +4,10 @@
   "description": "Apply policies to Hapi routes",
   "main": "lib/index",
   "scripts": {
-    "test": "node_modules/lab/bin/lab -r lcov | node node_modules/coveralls/bin/coveralls.js; node_modules/lab/bin/lab -vvcL"
+    "test": "lab -a code -t 100 -L"
+  },
+  "engines": {
+    "node": ">=4.0.0"
   },
   "repository": {
     "type": "git",
@@ -14,23 +17,22 @@
     "hapi",
     "policy"
   ],
-  "author": "Mark Bradshaw <mark.bradshaw@gmail.com>, Brad Olson <brad.olson@movedbylight.com>, Pavel Polyakov",
+  "author": "Mark Bradshaw <mark.bradshaw@gmail.com>, contributors",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/mark-bradshaw/mrhorse/issues"
   },
   "homepage": "https://github.com/mark-bradshaw/mrhorse",
   "dependencies": {
-    "boom": "^2.8.0",
-    "hoek": "^2.14.0",
-    "items": "^1.1.0",
-    "lodash": "^3.10.1"
+    "boom": "3.1.x",
+    "hoek": "3.0.x",
+    "items": "2.0.x",
+    "lodash": "4.6.x"
   },
   "devDependencies": {
-    "code": "^1.5.0",
-    "coveralls": "^2.11.4",
-    "hapi": "^9.0.3",
-    "lab": "^5.15.2",
-    "wreck": "^6.2.0"
+    "code": "2.1.x",
+    "hapi": "13.x.x",
+    "lab": "10.3.x",
+    "wreck": "7.0.x"
   }
 }

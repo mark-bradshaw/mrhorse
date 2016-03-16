@@ -6,7 +6,7 @@ depends on Mr Horse.  You can see how that works below.
 */
 
 /* This will run after MrHorse is all loaded. */
-var after = function (server, next) {
+const after = function (server, next) {
 
     /* all the main policies are available to us for these routes, but just
     for kicks we'll load our own logged in policy.  Just keep in mind, ALL
@@ -14,7 +14,7 @@ var after = function (server, next) {
     named isLoggedIn, because that was already used in the main policy directory. */
     server.plugins.mrhorse.loadPolicies(server, {
         policyDirectory: __dirname + '/policies'
-    }, function (err) {
+    }, (err) => {
 
         if (err) {
             console.log(err);
@@ -42,7 +42,7 @@ var after = function (server, next) {
     });
 };
 
-exports.register = function register (server, options, next) {
+exports.register = function register(server, options, next) {
 
     server.dependency('mrhorse', after);
     next();

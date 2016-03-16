@@ -1,4 +1,6 @@
-var customMessage = function (request, reply, callback) {
+'use strict';
+
+const customMessage = function (request, reply, callback) {
 
     callback(null, false, 'custom');
 };

@@ -108,7 +108,7 @@ lab.experiment('Non standard setups', function (done) {
     });
 
     lab.test('asserts on invalid defaultApplyPoint option.', function(done) {
-        
+
         var registration = function() {
             server.register({
                 register: MrHorse,
@@ -123,11 +123,11 @@ lab.experiment('Non standard setups', function (done) {
                 }
             });
         };
-        
+
         Code.expect(registration).to.throw(Error, 'Specified invalid defaultApplyPoint: onIncorrect');
         done();
     });
-    
+
     lab.test('incorrect applyPoint', function (done) {
 
         // pull this bad policy in to the policies folder.
@@ -172,7 +172,7 @@ lab.experiment('Normal setup', function (done) {
                 request: false // we don't need to see tested implementation errors in console.
             }
         });
-        
+
         server.connection({
             port: 1234
         });
@@ -443,7 +443,7 @@ lab.experiment('Normal setup', function (done) {
                     policies: [
                         MrHorse.parallel('passes', 'customMessage',
                         function (policyNames, results, next) {
-                            
+
                             var transformedMessage = results.customMessage.message + ' and transformed';
                             next(null, false, transformedMessage);
                         })
@@ -469,7 +469,7 @@ lab.experiment('Normal setup', function (done) {
                 }
             }
         });
-        
+
         server.register({
             register: MrHorse,
             options : {
@@ -571,7 +571,7 @@ lab.experiment('Normal setup', function (done) {
     });
 
     lab.test('runs all policies', function (done) {
-        
+
         server.inject('/twopolicies', function (res) {
 
             Code.expect(res.statusCode).to.equal(200);
@@ -606,20 +606,20 @@ lab.experiment('Normal setup', function (done) {
             done();
         });
     });
-    
+
     lab.test('implementation error on policy as function with bad applyPoint', function (done) {
 
         var requestError;
-        
+
         var setRequestError = function (request, err) {
-        
+
             requestError = err;
         }
-        
+
         server.on('request-error', setRequestError);
 
         server.inject('/policy-as-function-bad-applypoint', function (res) {
-            
+
             server.removeListener('request-error', setRequestError);
 
             Code.expect(res.statusCode).to.equal(500);
@@ -628,7 +628,7 @@ lab.experiment('Normal setup', function (done) {
             done();
         });
     });
-    
+
     lab.test('runs policy as function with explicit applyPoint', function (done) {
 
         server.inject('/policy-as-function-posthandler', function (res) {
@@ -637,22 +637,22 @@ lab.experiment('Normal setup', function (done) {
             Code.expect(res.result.added).to.equal('this');
             done();
         });
-        
+
     });
-    
+
     lab.test('implementation error on policy not specified as string or function', function (done) {
 
         var requestError;
-        
+
         var setRequestError = function (request, err) {
-        
+
             requestError = err;
         }
-        
+
         server.on('request-error', setRequestError);
 
         server.inject('/policy-bad-type', function (res) {
-            
+
             server.removeListener('request-error', setRequestError);
 
             Code.expect(res.statusCode).to.equal(500);
@@ -661,22 +661,22 @@ lab.experiment('Normal setup', function (done) {
             done();
         });
     });
-    
+
     lab.test('parallel aggregate policy runs multiple policies', function (done) {
 
         server.inject('/parallel-ok', function (res) {
-            
+
             Code.expect(res.statusCode).to.equal(200);
             Code.expect(res.result.added).to.equal('this');
             Code.expect(res.result.addedAnother).to.equal('that');
             done();
         });
     });
-    
+
     lab.test('parallel aggregate policy fails if one policy fails', function (done) {
 
         server.inject('/parallel-fails', function (res) {
-            
+
             Code.expect(res.statusCode).to.equal(403);
             Code.expect(res.result.error).to.equal('Forbidden');
             done();
@@ -686,7 +686,7 @@ lab.experiment('Normal setup', function (done) {
     lab.test('parallel aggregate policy respects custom error responses', function (done) {
 
         server.inject('/parallel-custom-error', function (res) {
-            
+
             Code.expect(res.statusCode).to.equal(404);
             done();
         });
@@ -695,7 +695,7 @@ lab.experiment('Normal setup', function (done) {
     lab.test('parallel aggregate policy default error handler fails with error prioritized by listed policy order.', function (done) {
 
         server.inject('/parallel-default-handler', function (res) {
-            
+
             Code.expect(res.statusCode).to.equal(403);
             Code.expect(res.result.message).to.equal('custom late');
             done();
@@ -705,7 +705,7 @@ lab.experiment('Normal setup', function (done) {
     lab.test('parallel aggregate policy accepts custom error handler.', function (done) {
 
         server.inject('/parallel-custom-handler', function (res) {
-            
+
             Code.expect(res.statusCode).to.equal(403);
             Code.expect(res.result.message).to.equal('custom and transformed');
             done();
@@ -715,7 +715,7 @@ lab.experiment('Normal setup', function (done) {
     lab.test('parallel aggregate policy runs multiple policies when specified in array format', function (done) {
 
         server.inject('/parallel-as-array', function (res) {
-            
+
             Code.expect(res.statusCode).to.equal(200);
             Code.expect(res.result.added).to.equal('this');
             Code.expect(res.result.addedAnother).to.equal('that');

@@ -1,11 +1,13 @@
-var Wreck = require('wreck');
-var Boom = require('boom');
+'use strict';
 
-var moonInPhase = function (request, reply, next) {
+const Wreck = require('wreck');
+const Boom = require('boom');
 
-    var timestamp = parseInt(Date.now() / 1000);
+const moonInPhase = (request, reply, next) => {
 
-    Wreck.get('http://api.farmsense.net/v1/moonphases/?d=' + timestamp, { json: 'force' }, function (err, res, payload) {
+    const timestamp = parseInt(Date.now() / 1000);
+
+    Wreck.get('http://api.farmsense.net/v1/moonphases/?d=' + timestamp, { json: 'force' }, (err, res, payload) => {
 
         if (err || !payload || !payload[0] || payload[0].Error) {
 
@@ -25,4 +27,3 @@ var moonInPhase = function (request, reply, next) {
 moonInPhase.applyPoint = 'onPreHandler';
 
 module.exports = moonInPhase;
-

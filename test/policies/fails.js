@@ -1,4 +1,6 @@
-var fails = function (request, reply, callback) {
+'use strict';
+
+const fails = function (request, reply, callback) {
 
     callback(null, false);
 };
