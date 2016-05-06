@@ -6,8 +6,6 @@ Lead Maintainer: [Mark Bradshaw](https://github.com/mark-bradshaw), [contributor
 
 [![Build Status](https://travis-ci.org/mark-bradshaw/mrhorse.svg?branch=master)](https://travis-ci.org/mark-bradshaw/mrhorse) [![Coverage Status](https://img.shields.io/coveralls/mark-bradshaw/mrhorse.svg)](https://coveralls.io/r/mark-bradshaw/mrhorse) [![Dependencies Up To Date](https://david-dm.org/mark-bradshaw/mrhorse.svg?style=flat)](https://david-dm.org/mark-bradshaw/mrhorse)
 
-[![Join the chat at https://gitter.im/mark-bradshaw/mrhorse](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mark-bradshaw/mrhorse?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 ### What is it?
 
 This is inspired in part by policies in the sails.js project.  In sails policies are mostly used for authentication and authorization.  In hapi they can do just about anything.  Wouldn't it be nice to easily configure your routes for authentication by adding an 'isLoggedIn' tag?  Or before replying to a request checking to see if 'userHasAccessToWidget'?  Maybe you'd like to do some a/b testing, and want to change some requests to a different handler with 'splitAB'.  Or you'd like to add some special analytics tracking to some of your api requests, after your controller has already responded, with 'trackThisAtAWS'.  You create the policies and MrHorse applies them as directed, when directed.
