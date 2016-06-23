@@ -46,7 +46,7 @@ Often your route handlers end up doing a lot of repeated work to collect data, c
 
 [MrHorse](https://github.com/mark-bradshaw/mrhorse) let's you take those repeated bits of code and centralize them into  "policies", which are just single purpose javascript functions with the signature `function(request, reply, next)`.  Policies are a good fit whenever you find yourself repeating code in your handlers.  Policies can be used for authentication, authorization, reply modification and shaping, logging, or just about anything else you can imagine.  Policies can be applied at any point in the [Hapi request life cycle](http://hapijs.com/api#request-lifecycle), before authentication, before the request is processed, or even after a response has been created.  Once you've created a policy, you just apply it to whatever routes need it and let MrHorse take care of the rest.
 
-Using policies you can easily mix and match your business logic into your routes in a declarative manner.  This makes it much easier to see what is being done on each route, and allows you to centralize your authentication, authorization, or logging in one place to DRY out your code.  If a policy decides that there's a problem with the current request is can immediately reply back with a 403 forbidden error, or the error of your choice.  You always have the option of doing a custom reply, as well, and MrHorse will see that and step out of the way.
+Using policies you can easily mix and match your business logic into your routes in a declarative manner.  This makes it much easier to see what is being done on each route, and allows you to centralize your authentication, authorization, or logging in one place to DRY out your code.  If a policy decides that there's a problem with the current request it can immediately reply back with a 403 forbidden error, or the error of your choice.  You always have the option of doing a custom reply as well, and MrHorse will see that and step out of the way.
 
 
 ### Why use MrHorse instead of Hapi route prerequisites
@@ -149,7 +149,9 @@ server.plugins.mrhorse.loadPolicies(server, {
 
 Both strategies are fine, and can be complementary.  If your hapi project uses plugins to separate up functionality it is perfectly acceptable for each plugin to have its own `policies` folder.  Just use the `loadPolicies` function in each plugin.  See the example folder for additional detail.
 
-You can use mrhorse in as many places as you want.  It's ok to have multiple policies folders in different locations, and tell mrhorse to look in each one.  The only requirement is that each policy file name **must** be globally unique.
+You can use MrHorse in as many places as you want.  It's ok to have multiple policies folders in different locations, and tell MrHorse to look in each one.  The only requirement is that each policy file name **must** be globally unique, since policies can be used on any route in any location.
+
+Normally MrHorse would throw an error when it encounters a duplicate policy, and that's to keep you from accidentally duplicating a policy name, but there are situations that might make sense to ignore the duplicates.  For instance, you might be using a development tool like `wallaby` that will reload your server as you change code, and inadvertently cause MrHorse to reinitialize.  This would cause the process to throw an error and likely abort the server.  In that case you can add `ignoreDuplicates: true` to your MrHorse options and duplicate policies will be silently ignored.
 
 By default policies are applied at the `onPreHandler` event in the [Hapi request life cycle](http://hapijs.com/api#request-lifecycle) if no other event is specified in the policy.  Each policy can control which event to apply at.  You can also change the default event to whatever you want.  You would do this by passing in `defaultApplyPoint` in the options object when registering the plugin, like this:
 
