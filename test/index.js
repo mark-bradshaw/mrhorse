@@ -513,6 +513,15 @@ lab.experiment('Normal setup', function (done) {
 
     });
 
+    lab.test('ignores duplicate policies', function (done) {
+
+        server.plugins.mrhorse.loadPolicies(server, {policyDirectory: __dirname + '/policies', ignoreDuplicates: true}, function (err) {
+            Code.expect(err).to.not.exist();
+            done();
+        });
+
+    });
+
     lab.test('routes do not have to have a policy', function (done) {
 
         server.inject('/none', function (res) {
