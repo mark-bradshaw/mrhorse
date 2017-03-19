@@ -210,6 +210,34 @@ The events in the life cycle are:
 
 Post handlers can alter the response created by the response handler before it gets sent.  This is useful if you want to add additional data to the response before it goes out on the wire.  The response can be found in `request.response.source`, **only** after the request handler has run.  Before that time there is no response object.
 
+
+#### Loading many policies from a file
+
+A single file can contain multiple policies, if it exports an object.
+
+```javascript
+module.exports = {
+    myPolicy1 : function( request, reply, next ) { ... },
+    myPolicy2 : function( request, reply, next ) { ... },
+    ...
+};
+```
+
+
+#### Adding named policies programmatically
+
+```javascript
+server.plugins.addPolicy( 'myPolicy1', function( request, reply, next ) { ... } );
+```
+
+
+#### Check if policy exists
+
+```javascript
+server.plugins.hasPolicy( 'myPolicy' ); // true | false
+```
+
+
 #### Apply to routes
 
 Now that you've created your policy, apply it to whatever routes you want.
@@ -340,3 +368,34 @@ var routes = [
    - `canContinue:` the boolean value passed to the pertinent policy's `next` callback, deciding if the policy passed or failed.
    - `message:` the custom error message passed to the pertinent policy's `next` callback, intended to become part of a `403 Forbidden` error.
  - `next(err, canContinue, message)` is the final callback for the aggregate policy.  This behaves the same as a standard policy's `next` callback, accepting a custom `err`, a `canContinue` boolean, and a custom `message` as arguments.
+
+
+##### Conditional Policies
+
+Normally all policies must be satisfied.
+
+MrHorse exposes `MrHorse.orPolicy()` function to provide an easy way to define a set of policies of which **at least one** must be satisfied.
+The tests are run in parallel. Error messages from unsatisfied policies are ignored, as long as at least one listed policy is satisfied.
+
+If all policies are unsatisfied, the request is rejected with the error message of the leftmost policy.
+
+```javascript
+var MrHorse = require( 'mrhorse' );
+
+var routes = [
+   {
+       method: 'your_method',
+       path: '/your/path/here',
+       handler: your_route_handler,
+       config: {
+           plugins: {
+               policies: [
+                    'isAnimal', // must be satisfied
+                    MrHorse.orPolicy( 'isMammal', 'isReptile', 'isInsect' ), // at least ONE must be satisfied
+                    [ 'isBird', 'isBluejay' ] // must ALL be satisfied
+                ]
+           }
+       }
+   }
+];
+```
