@@ -826,6 +826,9 @@ lab.experiment('Normal setup', function (done) {
     });
 
     lab.test('policy can be added programmatically', function (done) {
+
+        Code.expect(server.plugins.mrhorse.hasPolicy('yetAnotherPolicy')).to.equal(false);
+
         server.plugins.mrhorse.addPolicy('yetAnotherPolicy', (request, reply, callback) => callback(null, true));
 
         Code.expect(server.plugins.mrhorse.hasPolicy('yetAnotherPolicy')).to.equal(true);
@@ -871,6 +874,50 @@ lab.experiment('Normal setup', function (done) {
             Code.expect(res.statusCode).to.equal(403);
             done();
         });
+    });
+
+    lab.test('programmatically added policy can be attached to a route', function (done) {
+
+        const policyName = 'injectedPolicy';
+		let policyCalled = false;
+
+        Code.expect(server.plugins.mrhorse.hasPolicy(policyName)).to.equal(false);
+
+        const policy = (request, reply, next) => {
+
+            policyCalled = true;
+            next( null, true );
+        };
+
+        server.plugins.mrhorse.addPolicy(policyName, policy);
+
+		server.route({
+			method : 'GET',
+			path   : '/add-policy-test',
+			handler: function (request, reply) {
+
+				reply({
+					handler: 'handler'
+				});
+			},
+			config : {
+				plugins: {
+					policies: [
+						policyName
+					]
+				}
+			}
+		});
+
+		Code.expect(policyCalled).to.equal(false);
+
+		server.inject('/add-policy-test', function (res) {
+
+			Code.expect(res.statusCode).to.equal(200);
+			Code.expect(policyCalled).to.equal(true);
+			done();
+		});
+
     });
 
 
