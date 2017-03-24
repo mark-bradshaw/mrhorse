@@ -879,7 +879,7 @@ lab.experiment('Normal setup', function (done) {
     lab.test('programmatically added policy can be attached to a route', function (done) {
 
         const policyName = 'injectedPolicy';
-		let policyCalled = false;
+		var policyCalled = false;
 
         Code.expect(server.plugins.mrhorse.hasPolicy(policyName)).to.equal(false);
 
