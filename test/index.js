@@ -713,21 +713,26 @@ lab.experiment('Normal setup', function (done) {
 
         var requestError;
 
-        var setRequestError = function (request, err) {
+        var setRequestError = function (request, event) {
 
-            requestError = err;
+            if (event.tags.length === 3 && event.tags[2] === 'error') {
+                requestError = event.data;
+            }
         }
 
-        server.on('request-error', setRequestError);
+        server.on('request-internal', setRequestError);
 
         server.inject('/policy-as-function-bad-applypoint', function (res) {
 
-            server.removeListener('request-error', setRequestError);
-
             Code.expect(res.statusCode).to.equal(500);
-            Code.expect(requestError).to.be.an.instanceof(Error);
-            Code.expect(requestError.message).to.equal('Trying to use incorrect applyPoint for the dynamic policy: onIncorrect');
-            done();
+
+            setTimeout(() => {
+                server.removeListener('request-internal', setRequestError);
+
+                Code.expect(requestError.message).to.equal('Trying to use incorrect applyPoint for the dynamic policy: onIncorrect');
+                done();
+            }, 5);
+
         });
     });
 
@@ -746,21 +751,25 @@ lab.experiment('Normal setup', function (done) {
 
         var requestError;
 
-        var setRequestError = function (request, err) {
+        var setRequestError = function (request, event) {
 
-            requestError = err;
+            if (event.tags.length === 3 && event.tags[2] === 'error') {
+                requestError = event.data;
+            }
         }
 
-        server.on('request-error', setRequestError);
+        server.on('request-internal', setRequestError);
 
         server.inject('/policy-bad-type', function (res) {
 
-            server.removeListener('request-error', setRequestError);
-
             Code.expect(res.statusCode).to.equal(500);
-            Code.expect(requestError).to.be.an.instanceof(Error);
-            Code.expect(requestError.message).to.equal('Policy not specified by name or by function.');
-            done();
+
+            setTimeout(() => {
+                server.removeListener('request-internal', setRequestError);
+
+                Code.expect(requestError.message).to.equal('Policy not specified by name or by function.');
+                done();
+            }, 5);
         });
     });
 
