@@ -197,7 +197,7 @@ You can also provide a custom message as a third parameter [`next(null, false, '
 
 If your policy has nothing to do with authentication or authorization, you will just want to respond back with true to continue normal processing of the request [`next(null, true)`].
 
-By default all policies are assumed to be pre-handlers unless you specify otherwise.  You can, however, choose to run a policy at any point in the [Hapi request life cycle](http://hapijs.com/api#request-lifecycle) by specifying one of the event names that Hapi provides.  If you would like additional information about events are called in the Hapi request life cycle, please refer to the [Hapi documentation](http://hapijs.com/api#request-lifecycle).
+By default all policies are assumed to be pre-handlers unless you specify otherwise.  You can, however, choose to run a policy at any point in the [Hapi request life cycle](http://hapijs.com/api#request-lifecycle) by specifying one of the event names that Hapi provides.  If you would like additional information about events that are called in the Hapi request life cycle, please refer to the [Hapi documentation](http://hapijs.com/api#request-lifecycle).
 
 The events in the life cycle are:
 
@@ -213,12 +213,12 @@ Post handlers can alter the response created by the response handler before it g
 
 #### Loading many policies from a file
 
-A single file can contain multiple policies, if it exports an object.
+A single file can contain multiple policies, if it exports them in the exports object.
 
 ```javascript
 module.exports = {
-    myPolicy1 : function( request, reply, next ) { ... },
-    myPolicy2 : function( request, reply, next ) { ... },
+    myPolicy1 : function(request, reply, next) { ... },
+    myPolicy2 : function(request, reply, next) { ... },
     ...
 };
 ```
@@ -227,14 +227,14 @@ module.exports = {
 #### Adding named policies programmatically
 
 ```javascript
-server.plugins.addPolicy( 'myPolicy1', function( request, reply, next ) { ... } );
+server.plugins.addPolicy('myPolicy1', function(request, reply, next) { ... });
 ```
 
 
 #### Check if policy exists
 
 ```javascript
-server.plugins.hasPolicy( 'myPolicy' ); // true | false
+server.plugins.hasPolicy('myPolicy'); // true | false
 ```
 
 
@@ -261,7 +261,7 @@ var routes = [
 In the `config.plugins.policies` array you can also include raw policy functions.
 ```javascript
 var isAdminPolicy = function isAdmin (request, reply, next) {
-    
+
     if (hasAdminAccess(request)) {
         next(null, true);
     } else {
@@ -291,16 +291,16 @@ This can be used with currying to great effect.
 var hasRole = function(roleName) {
 
     var hasSpecificRole = function hasSpecificRole (request, reply, next) {
-        
+
         if (hasRole(request, roleName)) {
             next(null, true);
         } else {
             next(null, false);
         }
     };
-    
+
     hasSpecificRole.applyPoint = 'onPreHandler';
-    
+
     return hasSpecificRole;
 };
 
@@ -319,8 +319,7 @@ var routes = [
 ```
 
 ##### Running policies in parallel
-If you'd like to run policies in parallel, you can specify a list of loaded policies' names as an array or as individual arguments to `MrHorse.parallel`.
-When policies are run in parallel, expect all policies to complete.  If any of the policies specify an error or `Forbidden 403` message, the error response from the left-most policy will be returned to the browser.
+If you'd like to run policies in parallel, you can specify a list of loaded policies' names as an array or as individual arguments to `MrHorse.parallel`.  When policies are run in parallel, expect all policies to complete.  If any of the policies specify an error or `Forbidden 403` message, the error response from the left-most policy will be returned to the browser.
 
 ```javascript
 var routes = [
@@ -380,7 +379,7 @@ The tests are run in parallel. Error messages from unsatisfied policies are igno
 If all policies are unsatisfied, the request is rejected with the error message of the leftmost policy.
 
 ```javascript
-var MrHorse = require( 'mrhorse' );
+var MrHorse = require('mrhorse');
 
 var routes = [
    {
@@ -391,8 +390,8 @@ var routes = [
            plugins: {
                policies: [
                     'isAnimal', // must be satisfied
-                    MrHorse.orPolicy( 'isMammal', 'isReptile', 'isInsect' ), // at least ONE must be satisfied
-                    [ 'isBird', 'isBluejay' ] // must ALL be satisfied
+                    MrHorse.orPolicy('isMammal', 'isReptile', 'isInsect'), // at least ONE must be satisfied
+                    ['isBird', 'isBluejay'] // ALL must be satisfied
                 ]
            }
        }
