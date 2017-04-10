@@ -29,6 +29,18 @@ var server = null;
 
 lab.experiment('Non standard setups', function (done) {
 
+    lab.before(function (done) {
+        try {
+            fs.rmdirSync(__dirname + '/emptypolicies');
+            fs.unlinkSync(__dirname + '/incorrect-policies/incorrectApplyPoint.js');
+            fs.rmdirSync(__dirname + '/incorrect-policies');
+        }
+        catch( err ) { /* do nothing */ }
+
+        done();
+    });
+
+
     lab.beforeEach(function (done) {
 
         server = new Hapi.Server();
@@ -99,7 +111,7 @@ lab.experiment('Non standard setups', function (done) {
             }
 
             Code.expect(server.plugins.mrhorse.data.setHandlers.onPostHandler).to.equal(true);
-            Code.expect(Object.keys(server.plugins.mrhorse.data.onPostHandler).length).to.equal(10);
+            Code.expect(Object.keys(server.plugins.mrhorse.data.onPostHandler).length).to.equal(14);
 
             server.plugins.mrhorse.reset();
 
@@ -470,6 +482,78 @@ lab.experiment('Normal setup', function (done) {
             }
         });
 
+        server.route({
+            method : 'GET',
+            path   : '/or-first-ok',
+            handler: function (request, reply) {
+
+                reply({
+                    handler: 'handler'
+                });
+            },
+            config : {
+                plugins: {
+                    policies: [
+                        MrHorse.orPolicy( 'multiPolicyOkA', 'multiPolicyFailB' )
+                    ]
+                }
+            }
+        });
+
+        server.route({
+            method : 'GET',
+            path   : '/or-second-ok',
+            handler: function (request, reply) {
+
+                reply({
+                    handler: 'handler'
+                });
+            },
+            config : {
+                plugins: {
+                    policies: [
+                        MrHorse.orPolicy( 'multiPolicyFailA', 'multiPolicyOkB' )
+                    ]
+                }
+            }
+        });
+
+        server.route({
+            method : 'GET',
+            path   : '/or-both-ok',
+            handler: function (request, reply) {
+
+                reply({
+                    handler: 'handler'
+                });
+            },
+            config : {
+                plugins: {
+                    policies: [
+                        MrHorse.orPolicy( 'multiPolicyOkA', 'multiPolicyOkB' )
+                    ]
+                }
+            }
+        });
+
+        server.route({
+            method : 'GET',
+            path   : '/or-both-fail',
+            handler: function (request, reply) {
+
+                reply({
+                    handler: 'handler'
+                });
+            },
+            config : {
+                plugins: {
+                    policies: [
+                        MrHorse.orPolicy( 'multiPolicyFailA', 'multiPolicyFailB' )
+                    ]
+                }
+            }
+        });
+
         server.register({
             register: MrHorse,
             options : {
@@ -520,6 +604,15 @@ lab.experiment('Normal setup', function (done) {
             done();
         });
 
+    });
+
+    lab.test('loads multiple policies from a single file', function (done) {
+
+        Code.expect(server.plugins.mrhorse.hasPolicy('multiPolicyOkA')).to.equal(true);
+        Code.expect(server.plugins.mrhorse.hasPolicy('multiPolicyFailA')).to.equal(true);
+        Code.expect(server.plugins.mrhorse.hasPolicy('multiPolicyOkB')).to.equal(true);
+        Code.expect(server.plugins.mrhorse.hasPolicy('multiPolicyFailB')).to.equal(true);
+        done();
     });
 
     lab.test('routes do not have to have a policy', function (done) {
@@ -731,5 +824,101 @@ lab.experiment('Normal setup', function (done) {
             done();
         });
     });
+
+    lab.test('policy can be added programmatically', function (done) {
+
+        Code.expect(server.plugins.mrhorse.hasPolicy('yetAnotherPolicy')).to.equal(false);
+
+        server.plugins.mrhorse.addPolicy('yetAnotherPolicy', (request, reply, callback) => callback(null, true));
+
+        Code.expect(server.plugins.mrhorse.hasPolicy('yetAnotherPolicy')).to.equal(true);
+        done();
+    });
+
+    lab.test('hasPolicy returns false on non-existent policies', function (done) {
+        Code.expect(server.plugins.mrhorse.hasPolicy('thisPolicyAbsolutelyDoesNotExist')).to.equal(false);
+        done();
+    });
+
+    lab.test('orPolicy creates a chain of policies in which only one must succeed (left)', function (done) {
+
+        server.inject('/or-first-ok', function (res) {
+
+            Code.expect(res.statusCode).to.equal(200);
+            done();
+        });
+    });
+
+    lab.test('orPolicy creates a chain of policies in which only one must succeed (right)', function (done) {
+
+        server.inject('/or-second-ok', function (res) {
+
+            Code.expect(res.statusCode).to.equal(200);
+            done();
+        });
+    });
+
+    lab.test('orPolicy creates a chain of policies in which both may succeed', function (done) {
+
+        server.inject('/or-both-ok', function (res) {
+
+            Code.expect(res.statusCode).to.equal(200);
+            done();
+        });
+    });
+
+    lab.test('orPolicy creates a chain of policies in which at least one must succeed', function (done) {
+
+        server.inject('/or-both-fail', function (res) {
+
+            Code.expect(res.statusCode).to.equal(403);
+            done();
+        });
+    });
+
+    lab.test('programmatically added policy can be attached to a route', function (done) {
+
+        const policyName = 'injectedPolicy';
+        var policyCalled = false;
+
+        Code.expect(server.plugins.mrhorse.hasPolicy(policyName)).to.equal(false);
+
+        const policy = (request, reply, next) => {
+
+            policyCalled = true;
+            next( null, true );
+        };
+
+        server.plugins.mrhorse.addPolicy(policyName, policy);
+
+        server.route({
+            method : 'GET',
+            path   : '/add-policy-test',
+            handler: function (request, reply) {
+
+                reply({
+                    handler: 'handler'
+                });
+            },
+            config : {
+                plugins: {
+                    policies: [
+                        policyName
+                    ]
+                }
+            }
+        });
+
+        Code.expect(policyCalled).to.equal(false);
+
+        server.inject('/add-policy-test', function (res) {
+
+            Code.expect(res.statusCode).to.equal(200);
+            Code.expect(policyCalled).to.equal(true);
+            done();
+        });
+
+    });
+
 
 });
