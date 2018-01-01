@@ -1,8 +1,8 @@
 'use strict';
 
-const customMessage = function (request, reply, callback) {
+const customMessage = function () {
 
-    callback(null, false, 'custom');
+    throw new Error('custom');
 };
 
 module.exports = customMessage;

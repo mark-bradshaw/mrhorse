@@ -1,11 +1,15 @@
 'use strict';
 
-const timedCustomMessageEarly = function (request, reply, callback) {
+const timedCustomMessageEarly = function () {
 
-    setTimeout(() => {
+    return new Promise((resolve, reject) => {
 
-        callback(null, false, 'custom early');
-    }, 1);
+        setTimeout(() => {
+
+            reject(new Error('custom early'));
+        }, 1);
+
+    });
 };
 
 module.exports = timedCustomMessageEarly;

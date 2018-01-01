@@ -2,24 +2,24 @@
 
 module.exports = {
 
-    multiPolicyOkA : (request, reply, callback) => {
+    multiPolicyOkA : (request, h) => {
 
-        callback(null, true);
+        return h.continue;
     },
 
-    multiPolicyFailA : (request, reply, callback) => {
+    multiPolicyFailA : () => {
 
-        callback(null, false);
+        throw new Error();
     },
 
-    multiPolicyOkB : (request, reply, callback) => {
+    multiPolicyOkB : (request, h) => {
 
-        callback(null, true);
+        return h.continue;
     },
 
-    multiPolicyFailB : (request, reply, callback) => {
+    multiPolicyFailB : () => {
 
-        callback(null, false);
+        throw new Error();
     }
 
 };

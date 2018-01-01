@@ -1,9 +1,9 @@
 'use strict';
 
-const postHandler = function (request, reply, callback) {
+const postHandler = function (request, h) {
 
     request.response.source.added = 'this';
-    callback(null, true);
+    return h.continue;
 };
 
 postHandler.applyPoint = 'onPostHandler';
