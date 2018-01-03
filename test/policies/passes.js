@@ -1,8 +1,8 @@
 'use strict';
 
-const passes = function (request, reply, callback) {
+const passes = function (request, h) {
 
-    callback(null, true);
+    return h.continue;
 };
 
 module.exports = passes;

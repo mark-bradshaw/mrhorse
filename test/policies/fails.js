@@ -1,8 +1,8 @@
 'use strict';
 
-const fails = function (request, reply, callback) {
+const fails = function () {
 
-    callback(null, false);
+    throw new Error();
 };
 
 module.exports = fails;

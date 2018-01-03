@@ -1,9 +1,9 @@
 'use strict';
 
-const secondPasses = function (request, reply, callback) {
+const secondPasses = function (request, h) {
 
     request.response.source.ranSecondPasses = true;
-    callback(null, true);
+    return h.continue;
 };
 
 secondPasses.applyPoint = 'onPostHandler';

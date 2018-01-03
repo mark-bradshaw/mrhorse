@@ -1,8 +1,8 @@
 'use strict';
 
-const redirects = function (request, reply, callback) {
+const redirects = function (request, h) {
 
-    callback(reply.redirect('/'), false);
+    return h.redirect('/').takeover();
 };
 
 module.exports = redirects;

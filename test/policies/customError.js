@@ -2,9 +2,9 @@
 
 const Boom = require('boom');
 
-const customFail = function (request, reply, callback) {
+const customFail = function () {
 
-    callback(Boom.notFound());
+    throw Boom.notFound();
 };
 
 module.exports = customFail;

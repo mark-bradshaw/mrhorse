@@ -3,25 +3,18 @@
 const Wreck = require('wreck');
 const Boom = require('boom');
 
-const moonInPhase = (request, reply, next) => {
+const moonInPhase = async (request, h) => {
 
     const timestamp = parseInt(Date.now() / 1000);
+    const url = `http://api.farmsense.net/v1/moonphases/?d=${timestamp}`;
+    console.log(`Getting ${url}`);
 
-    Wreck.get('http://api.farmsense.net/v1/moonphases/?d=' + timestamp, { json: 'force' }, (err, res, payload) => {
+    const { res, payload } = await Wreck.get(url, { json: 'force' });
+    if (payload[0].Phase !== 'Waning Cresent') {
+        throw Boom.forbidden(`${payload[0].Phase} is the wrong moon phase for admin night.`);
+    }
 
-        if (err || !payload || !payload[0] || payload[0].Error) {
-
-            return next(Boom.badImplementation(), false);
-        }
-
-        if (payload[0].Phase !== 'Waning Cresent') {
-
-            return next(null, false, payload[0].Phase + ' is the wrong moon phase for admin night.');
-        }
-
-        next(null, true);
-    });
-
+    return h.continue;
 };
 
 moonInPhase.applyPoint = 'onPreHandler';

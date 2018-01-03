@@ -1,14 +1,14 @@
 /* eslint-disable */
 
-var MrHorse = require('..');
-var Code = require('code');
-var fs = require('fs');
-var Hapi = require('hapi');
-var Lab = require('lab');
-var lab = exports.lab = Lab.script();
-var util = require('util');
+const MrHorse = require('..');
+const Code = require('code');
+const fs = require('fs');
+const Hapi = require('hapi');
+const Lab = require('lab');
+const lab = exports.lab = Lab.script();
+const util = require('util');
 
-var request = {
+const request = {
     route: {
         settings: {
             plugins: {
@@ -18,53 +18,45 @@ var request = {
     }
 };
 
-var reply = {
+const reply = {
     called  : 0,
     continue: function () {
         reply.called++;
     }
 };
 
-var server = null;
+let server = null;
 
-lab.experiment('Non standard setups', function (done) {
+lab.experiment('Non standard setups', function () {
 
-    lab.before(function (done) {
+    lab.before(function () {
         try {
             fs.rmdirSync(__dirname + '/emptypolicies');
             fs.unlinkSync(__dirname + '/incorrect-policies/incorrectApplyPoint.js');
             fs.rmdirSync(__dirname + '/incorrect-policies');
         }
         catch( err ) { /* do nothing */ }
-
-        done();
     });
 
 
-    lab.beforeEach(function (done) {
+    lab.beforeEach(function () {
 
-        server = new Hapi.Server();
-        server.connection({
-            port: 12345
-        });
-        done();
+        server = new Hapi.Server( { port: 12345 } );
     });
 
-    lab.test('can register without a policy directory', function (done) {
+    lab.test('can register without a policy directory', function () {
 
-        server.register({
-                register: MrHorse,
+        return server.register({
+                plugin: MrHorse,
                 options: {}
-            },
-            function () {
-
+            })
+            .then( () => {
                 Code.expect(server.plugins.mrhorse).to.be.an.object();
                 Code.expect(server.plugins.mrhorse.data.names.length).to.equal(0);
-                done();
             });
     });
 
-    lab.test('ignores an empty policy directory', function (done) {
+    lab.test('ignores an empty policy directory', function () {
 
         try {
             fs.mkdirSync(__dirname + '/emptypolicies');
@@ -73,14 +65,13 @@ lab.experiment('Non standard setups', function (done) {
             console.log(err);
         }
 
-        server.register({
-                register: MrHorse,
+        return server.register({
+                plugin: MrHorse,
                 options: {
                     policyDirectory: __dirname + '/emptypolicies'
                 }
-            },
-            function () {
-
+            })
+            .then( () => {
                 Code.expect(server.plugins.mrhorse).to.be.an.object();
                 Code.expect(server.plugins.mrhorse.data.names.length).to.equal(0);
 
@@ -91,56 +82,42 @@ lab.experiment('Non standard setups', function (done) {
                 catch (err) {
                     console.log(err);
                 }
-
-                done();
             });
     });
 
-    lab.test('accepts an alternate default apply point', function(done) {
+    lab.test('accepts an alternate default apply point', function() {
 
-        server.register({
-            register: MrHorse,
+        return server.register({
+            plugin: MrHorse,
             options : {
                 policyDirectory: __dirname + '/policies',
                 defaultApplyPoint: 'onPostHandler'
             }
-        }, function (err) {
-
-            if (err) {
-                console.log(err);
-            }
-
+        })
+        .then( () => {
             Code.expect(server.plugins.mrhorse.data.setHandlers.onPostHandler).to.equal(true);
-            Code.expect(Object.keys(server.plugins.mrhorse.data.onPostHandler).length).to.equal(14);
+            Code.expect(Object.keys(server.plugins.mrhorse.data.onPostHandler).length).to.equal(15);
 
             server.plugins.mrhorse.reset();
-
-            done();
         });
     });
 
-    lab.test('asserts on invalid defaultApplyPoint option.', function(done) {
+    lab.test('asserts on invalid defaultApplyPoint option.', async function() {
 
-        var registration = function() {
-            server.register({
-                register: MrHorse,
+        const registration = function() {
+            return server.register({
+                plugin: MrHorse,
                 options : {
                     policyDirectory: __dirname + '/policies',
                     defaultApplyPoint: 'onIncorrect'
                 }
-            }, function(err) {
-
-                if (err) {
-                    console.error(err);
-                }
             });
         };
 
-        Code.expect(registration).to.throw(Error, 'Specified invalid defaultApplyPoint: onIncorrect');
-        done();
+        await Code.expect(registration()).to.reject(Error, 'Specified invalid defaultApplyPoint: onIncorrect');
     });
 
-    lab.test('incorrect applyPoint', function (done) {
+    lab.test('incorrect applyPoint', function () {
 
         // pull this bad policy in to the policies folder.
         try {
@@ -150,59 +127,59 @@ lab.experiment('Non standard setups', function (done) {
             console.log(err);
         }
 
-        server.register({
-                register: MrHorse,
+        return server.register({
+                plugin: MrHorse,
                 options : {
                     policyDirectory: __dirname + '/incorrect-policies'
                 }
-            },
-            function (err) {
+            })
+            .then(
+                () => { throw new Error('Unexpected success'); },
+                function (err) {
 
-                Code.expect(err.toString()).to.equal('Error: Trying to set incorrect applyPoint for the policy: onIncorrect');
-
-                // cleanup
-                server.plugins.mrhorse.reset();
-                try {
-                    fs.unlinkSync(__dirname + '/incorrect-policies/incorrectApplyPoint.js');
-                    fs.rmdirSync(__dirname + '/incorrect-policies');
-                } catch (err2) {
-                    console.log(err2);
+                    Code.expect(err.toString()).to.equal('Error: Trying to set incorrect applyPoint for the policy: onIncorrect');
                 }
+            )
+            .then(
+                () => {
 
-                done();
-
+                   // cleanup
+                    server.plugins.mrhorse.reset();
+                    try {
+                        fs.unlinkSync(__dirname + '/incorrect-policies/incorrectApplyPoint.js');
+                        fs.rmdirSync(__dirname + '/incorrect-policies');
+                    } catch (err2) {
+                        console.log(err2);
+                    }
             });
     });
 });
 
-lab.experiment('Normal setup', function (done) {
+lab.experiment('Normal setup', function () {
 
-    lab.beforeEach(function (done) {
+    lab.beforeEach(function () {
 
         server = new Hapi.Server({
             debug: {
                 request: false // we don't need to see tested implementation errors in console.
-            }
-        });
-
-        server.connection({
+            },
             port: 1234
         });
 
         server.route({
             method : 'GET',
             path   : '/none',
-            handler: function (request, reply) {
-                reply('none');
+            handler: async function () {
+                return 'none';
             }
         });
 
         server.route({
             method : 'GET',
             path   : '/ok',
-            handler: function (request, reply) {
+            handler: async function () {
 
-                reply('ok');
+                return 'ok';
             },
             config : {
                 plugins: {
@@ -214,9 +191,9 @@ lab.experiment('Normal setup', function (done) {
         server.route({
             method : 'GET',
             path   : '/fails',
-            handler: function (request, reply) {
+            handler: async function () {
 
-                reply('ok');
+                return 'ok';
             },
             config : {
                 plugins: {
@@ -228,9 +205,9 @@ lab.experiment('Normal setup', function (done) {
         server.route({
             method : 'GET',
             path   : '/custommessage',
-            handler: function (request, reply) {
+            handler: async function () {
 
-                reply('ok');
+                return 'ok';
             },
             config : {
                 plugins: {
@@ -242,9 +219,9 @@ lab.experiment('Normal setup', function (done) {
         server.route({
             method : 'GET',
             path   : '/customerror',
-            handler: function (request, reply) {
+            handler: async function () {
 
-                reply('ok');
+                return 'ok'
             },
             config : {
                 plugins: {
@@ -256,11 +233,11 @@ lab.experiment('Normal setup', function (done) {
         server.route({
             method : 'GET',
             path   : '/posthandler',
-            handler: function (request, reply) {
+            handler: async function () {
 
-                reply({
+                return {
                     handler: 'handler'
-                });
+                };
             },
             config : {
                 plugins: {
@@ -272,11 +249,11 @@ lab.experiment('Normal setup', function (done) {
         server.route({
             method : 'GET',
             path   : '/twopolicies',
-            handler: function (request, reply) {
+            handler: async function () {
 
-                reply({
+                return {
                     handler: 'handler'
-                });
+                };
             },
             config : {
                 plugins: {
@@ -288,11 +265,11 @@ lab.experiment('Normal setup', function (done) {
         server.route({
             method : 'GET',
             path   : '/redirects',
-            handler: function (request, reply) {
+            handler: async function () {
 
-                reply({
+                return {
                     handler: 'handler'
-                });
+                };
             },
             config : {
                 plugins: {
@@ -304,11 +281,11 @@ lab.experiment('Normal setup', function (done) {
         server.route({
             method : 'GET',
             path   : '/misspelled-policy',
-            handler: function (request, reply) {
+            handler: async function () {
 
-                reply({
+                return {
                     handler: 'handler'
-                });
+                };
             },
             config : {
                 plugins: {
@@ -320,9 +297,9 @@ lab.experiment('Normal setup', function (done) {
         server.route({
             method : 'GET',
             path   : '/policy-as-function-passes',
-            handler: function (request, reply) {
+            handler: async function () {
 
-                reply('ok');
+                return 'ok';
             },
             config : {
                 plugins: {
@@ -334,9 +311,9 @@ lab.experiment('Normal setup', function (done) {
         server.route({
             method : 'GET',
             path   : '/policy-as-function-bad-applypoint',
-            handler: function (request, reply) {
+            handler: async function () {
 
-                reply('ok');
+                return 'ok';
             },
             config : {
                 plugins: {
@@ -348,11 +325,11 @@ lab.experiment('Normal setup', function (done) {
         server.route({
             method : 'GET',
             path   : '/policy-as-function-posthandler',
-            handler: function (request, reply) {
+            handler: async function () {
 
-                reply({
+                return {
                     handler: 'handler'
-                });
+                };
             },
             config : {
                 plugins: {
@@ -364,11 +341,11 @@ lab.experiment('Normal setup', function (done) {
         server.route({
             method : 'GET',
             path   : '/policy-bad-type',
-            handler: function (request, reply) {
+            handler: async function (request, reply) {
 
-                reply({
+                return {
                     handler: 'handler'
-                });
+                };
             },
             config : {
                 plugins: {
@@ -380,11 +357,11 @@ lab.experiment('Normal setup', function (done) {
         server.route({
             method : 'GET',
             path   : '/parallel-ok',
-            handler: function (request, reply) {
+            handler: async function (request, reply) {
 
-                reply({
+                return {
                     handler: 'handler'
-                });
+                };
             },
             config : {
                 plugins: {
@@ -396,11 +373,11 @@ lab.experiment('Normal setup', function (done) {
         server.route({
             method : 'GET',
             path   : '/parallel-fails',
-            handler: function (request, reply) {
+            handler: async function (request, reply) {
 
-                reply({
+                return {
                     handler: 'handler'
-                });
+                };
             },
             config : {
                 plugins: {
@@ -412,11 +389,11 @@ lab.experiment('Normal setup', function (done) {
         server.route({
             method : 'GET',
             path   : '/parallel-custom-error',
-            handler: function (request, reply) {
+            handler: async function () {
 
-                reply({
+                return {
                     handler: 'handler'
-                });
+                };
             },
             config : {
                 plugins: {
@@ -428,11 +405,11 @@ lab.experiment('Normal setup', function (done) {
         server.route({
             method : 'GET',
             path   : '/parallel-default-handler',
-            handler: function (request, reply) {
+            handler: async function () {
 
-                reply({
+                return {
                     handler: 'handler'
-                });
+                };
             },
             config : {
                 plugins: {
@@ -444,20 +421,19 @@ lab.experiment('Normal setup', function (done) {
         server.route({
             method : 'GET',
             path   : '/parallel-custom-handler',
-            handler: function (request, reply) {
+            handler: async function () {
 
-                reply({
+                return {
                     handler: 'handler'
-                });
+                };
             },
             config : {
                 plugins: {
                     policies: [
                         MrHorse.parallel('passes', 'customMessage',
-                        function (policyNames, results, next) {
+                        function (policyNames, results) {
 
-                            var transformedMessage = results.customMessage.message + ' and transformed';
-                            next(null, false, transformedMessage);
+                            throw new Error( results.customMessage.err.message + ' and transformed' );
                         })
                     ]
                 }
@@ -467,11 +443,11 @@ lab.experiment('Normal setup', function (done) {
         server.route({
             method : 'GET',
             path   : '/parallel-as-array',
-            handler: function (request, reply) {
+            handler: async function () {
 
-                reply({
+                return {
                     handler: 'handler'
-                });
+                };
             },
             config : {
                 plugins: {
@@ -485,11 +461,11 @@ lab.experiment('Normal setup', function (done) {
         server.route({
             method : 'GET',
             path   : '/or-first-ok',
-            handler: function (request, reply) {
+            handler: async function () {
 
-                reply({
+                return {
                     handler: 'handler'
-                });
+                };
             },
             config : {
                 plugins: {
@@ -503,11 +479,11 @@ lab.experiment('Normal setup', function (done) {
         server.route({
             method : 'GET',
             path   : '/or-second-ok',
-            handler: function (request, reply) {
+            handler: async function () {
 
-                reply({
+                return {
                     handler: 'handler'
-                });
+                };
             },
             config : {
                 plugins: {
@@ -521,11 +497,11 @@ lab.experiment('Normal setup', function (done) {
         server.route({
             method : 'GET',
             path   : '/or-both-ok',
-            handler: function (request, reply) {
+            handler: async function () {
 
-                reply({
+                return {
                     handler: 'handler'
-                });
+                };
             },
             config : {
                 plugins: {
@@ -539,11 +515,11 @@ lab.experiment('Normal setup', function (done) {
         server.route({
             method : 'GET',
             path   : '/or-both-fail',
-            handler: function (request, reply) {
+            handler: async function () {
 
-                reply({
+                return {
                     handler: 'handler'
-                });
+                };
             },
             config : {
                 plugins: {
@@ -554,348 +530,353 @@ lab.experiment('Normal setup', function (done) {
             }
         });
 
-        server.register({
-            register: MrHorse,
+        server.route({
+            method : 'GET',
+            path   : '/strange',
+            handler: async function () {
+
+                return {
+                    handler: 'handler'
+                };
+            },
+            config : {
+                plugins: {
+                    policies: [
+                        'strangeError'
+                    ]
+                }
+            }
+        });
+
+
+        return server.register({
+            plugin: MrHorse,
             options : {
                 policyDirectory: __dirname + '/policies',
                 defaultApplyPoint: 'onPreHandler'
             }
-        }, function (err) {
-
-            if (err) {
-                console.log(err);
-            }
-            server.start(function () {
-
-                done();
-            });
-        });
+        })
+        .then( () => ( server.start() ) )
+        .catch( ( err ) => ( console.log( err ) ) )
     });
 
-    lab.afterEach(function (done) {
+
+    lab.afterEach(function () {
 
         server.plugins.mrhorse.reset();
-        server.stop(function () {
 
-            done();
-        });
+        return server.stop();
     });
 
-    lab.test('loads policies from a directory', function (done) {
+    lab.test('loads policies from a directory', function () {
 
         Code.expect(server.plugins.mrhorse.data.names.length).to.be.greaterThan(0);
-        done();
     });
 
-    lab.test('does not allow duplication of policies', function (done) {
+    lab.test('does not allow duplication of policies', function () {
 
-        server.plugins.mrhorse.loadPolicies(server, {policyDirectory: __dirname + '/policies'}, function (err) {
-
+        try {
+            server.plugins.mrhorse.loadPolicies(server, {policyDirectory: __dirname + '/policies'});
+            throw new Error('Should not reach here');
+        }
+        catch(err) {
             Code.expect(err.toString()).to.equal('Error: Trying to add a duplicate policy: customError');
-            done();
-        });
-
+        }
     });
 
-    lab.test('ignores duplicate policies', function (done) {
+    lab.test('ignores duplicate policies', function () {
 
-        server.plugins.mrhorse.loadPolicies(server, {policyDirectory: __dirname + '/policies', ignoreDuplicates: true}, function (err) {
-            Code.expect(err).to.not.exist();
-            done();
-        });
-
+        try {
+            server.plugins.mrhorse.loadPolicies(server, {policyDirectory: __dirname + '/policies', ignoreDuplicates: true});
+        }
+        catch(err) {
+            throw new Error('Should not reach here');
+        }
     });
 
-    lab.test('loads multiple policies from a single file', function (done) {
+    lab.test('loads multiple policies from a single file', function () {
 
         Code.expect(server.plugins.mrhorse.hasPolicy('multiPolicyOkA')).to.equal(true);
         Code.expect(server.plugins.mrhorse.hasPolicy('multiPolicyFailA')).to.equal(true);
         Code.expect(server.plugins.mrhorse.hasPolicy('multiPolicyOkB')).to.equal(true);
         Code.expect(server.plugins.mrhorse.hasPolicy('multiPolicyFailB')).to.equal(true);
-        done();
     });
 
-    lab.test('routes do not have to have a policy', function (done) {
+    lab.test('routes do not have to have a policy', function () {
 
-        server.inject('/none', function (res) {
-
-            Code.expect(res.result).to.equal('none');
-            done();
-        });
+        return server.inject('/none')
+            .then((res) => {
+                Code.expect(res.result).to.equal('none');
+            });
     });
 
-    lab.test('passing policies get to route handler', function (done) {
+    lab.test('passing policies get to route handler', function () {
 
-        server.inject('/ok', function (res) {
-
-            Code.expect(res.result).to.equal('ok');
-            done();
-        });
+        return server.inject('/ok')
+            .then((res) => {
+                Code.expect(res.result).to.equal('ok');
+            });
     });
 
-    lab.test('failing policies get a 403', function (done) {
+    lab.test('failing policies get a 403', function () {
 
-        server.inject('/fails', function (res) {
-
-            Code.expect(res.statusCode).to.equal(403);
-            Code.expect(res.result.error).to.equal('Forbidden');
-            done();
-        });
+        return server.inject('/fails')
+            .then((res) => {
+                Code.expect(res.statusCode).to.equal(403);
+                Code.expect(res.result.error).to.equal('Forbidden');
+            });
     });
 
-    lab.test('failing policies with a custom message get the message sent in the reply', function (done) {
+    lab.test('failing policies with a custom message get the message sent in the reply', function () {
 
-        server.inject('/custommessage', function (res) {
-
-            Code.expect(res.statusCode).to.equal(403);
-            Code.expect(res.result.message).to.equal('custom');
-            done();
-        });
+        return server.inject('/custommessage')
+            .then((res) => {
+                Code.expect(res.statusCode).to.equal(403);
+                Code.expect(res.result.message).to.equal('custom');
+            });
     });
 
-    lab.test('failing policy can give a custom error', function (done) {
+    lab.test('failing policy can give a custom error', function () {
 
-        server.inject('/customerror', function (res) {
-
-            Code.expect(res.statusCode).to.equal(404);
-            done();
-        });
+        return server.inject('/customerror')
+            .then((res) => {
+                Code.expect(res.statusCode).to.equal(404);
+            });
     });
 
-    lab.test('policy can run as a posthandler', function (done) {
+    lab.test('policy can run as a posthandler', function () {
 
-        server.inject('/posthandler', function (res) {
-
-            Code.expect(res.statusCode).to.equal(200);
-            Code.expect(res.result.added).to.equal('this');
-            done();
-        });
+        return server.inject('/posthandler')
+            .then((res) => {
+                Code.expect(res.statusCode).to.equal(200);
+                Code.expect(res.result.added).to.equal('this');
+            });
     });
 
-    lab.test('runs all policies', function (done) {
+    lab.test('runs all policies', function () {
 
-        server.inject('/twopolicies', function (res) {
-
-            Code.expect(res.statusCode).to.equal(200);
-            Code.expect(res.result.ranSecondPasses).to.equal(true);
-            done();
-        });
+        return server.inject('/twopolicies')
+            .then((res) => {
+                Code.expect(res.statusCode).to.equal(200);
+                Code.expect(res.result.ranSecondPasses).to.equal(true);
+            });
     });
 
-    lab.test('policy which redirects', function (done) {
+    lab.test('policy which redirects', function () {
 
-        server.inject('/redirects', function (res) {
-
-            Code.expect(res.statusCode).to.equal(302);
-            done();
-        });
+        return server.inject('/redirects')
+            .then((res) => {
+                Code.expect(res.statusCode).to.equal(302);
+            });
     });
 
-    lab.test('error on misspelled policy', function (done) {
+    lab.test('error on misspelled policy', function () {
 
-        server.inject('/misspelled-policy', function (res) {
-
-            Code.expect(res.statusCode).to.equal(501);
-            done();
-        });
+        return server.inject('/misspelled-policy')
+            .then((res) => {
+                Code.expect(res.statusCode).to.equal(501);
+            });
     });
 
-    lab.test('runs policy as function', function (done) {
+    lab.test('runs policy as function', function () {
 
-        server.inject('/policy-as-function-passes', function (res) {
-
-            Code.expect(res.result).to.equal('ok');
-            done();
-        });
+        return server.inject('/policy-as-function-passes')
+            .then((res) => {
+                Code.expect(res.result).to.equal('ok');
+            });
     });
 
-    lab.test('implementation error on policy as function with bad applyPoint', function (done) {
+    lab.test('implementation error on policy as function with bad applyPoint', function () {
 
-        var requestError;
+        let requestError;
 
-        var setRequestError = function (request, event) {
+        const setRequestError = function (request, event) {
 
             if (event.tags.length === 3 && event.tags[2] === 'error') {
-                requestError = event.data;
+                requestError = event.error;
             }
-        }
+        };
 
-        server.on('request-internal', setRequestError);
+        server.events.on('request', setRequestError);
 
-        server.inject('/policy-as-function-bad-applypoint', function (res) {
+        return new Promise(function (resolve, reject) {
 
-            Code.expect(res.statusCode).to.equal(500);
+            server.inject('/policy-as-function-bad-applypoint')
+                .then((res) => {
+                    Code.expect(res.statusCode).to.equal(500);
 
-            setTimeout(() => {
-                server.removeListener('request-internal', setRequestError);
+                    setTimeout(() => {
+                        server.events.removeListener('request', setRequestError);
 
-                Code.expect(requestError.message).to.equal('Trying to use incorrect applyPoint for the dynamic policy: onIncorrect');
-                done();
-            }, 5);
+                        Code.expect(requestError.message).to.equal('Trying to use incorrect applyPoint for the dynamic policy: onIncorrect');
 
+                        resolve();
+                    }, 5);
+                });
         });
     });
 
-    lab.test('runs policy as function with explicit applyPoint', function (done) {
+    lab.test('runs policy as function with explicit applyPoint', function () {
 
-        server.inject('/policy-as-function-posthandler', function (res) {
-
-            Code.expect(res.statusCode).to.equal(200);
-            Code.expect(res.result.added).to.equal('this');
-            done();
-        });
+        return server.inject('/policy-as-function-posthandler')
+            .then((res) => {
+                Code.expect(res.statusCode).to.equal(200);
+                Code.expect(res.result.added).to.equal('this');
+            });
 
     });
 
-    lab.test('implementation error on policy not specified as string or function', function (done) {
+    lab.test('implementation error on policy not specified as string or function', function () {
 
-        var requestError;
+        let requestError;
 
-        var setRequestError = function (request, event) {
+        const setRequestError = function (request, event) {
 
             if (event.tags.length === 3 && event.tags[2] === 'error') {
-                requestError = event.data;
+                requestError = event.error;
             }
-        }
+        };
 
-        server.on('request-internal', setRequestError);
+        server.events.on('request', setRequestError);
 
-        server.inject('/policy-bad-type', function (res) {
+        return new Promise(function (resolve, reject) {
 
-            Code.expect(res.statusCode).to.equal(500);
+            server.inject('/policy-bad-type')
+                .then((res) => {
+                    Code.expect(res.statusCode).to.equal(500);
 
-            setTimeout(() => {
-                server.removeListener('request-internal', setRequestError);
+                    setTimeout(() => {
+                        server.events.removeListener('request', setRequestError);
 
-                Code.expect(requestError.message).to.equal('Policy not specified by name or by function.');
-                done();
-            }, 5);
+                        Code.expect(requestError.message).to.equal('Policy not specified by name or by function.');
+
+                        resolve();
+                    }, 5);
+                });
         });
     });
 
-    lab.test('parallel aggregate policy runs multiple policies', function (done) {
+    lab.test('parallel aggregate policy runs multiple policies', function () {
 
-        server.inject('/parallel-ok', function (res) {
+        return server.inject('/parallel-ok')
+            .then((res) => {
 
-            Code.expect(res.statusCode).to.equal(200);
-            Code.expect(res.result.added).to.equal('this');
-            Code.expect(res.result.addedAnother).to.equal('that');
-            done();
-        });
+                Code.expect(res.statusCode).to.equal(200);
+                Code.expect(res.result.added).to.equal('this');
+                Code.expect(res.result.addedAnother).to.equal('that');
+            });
     });
 
-    lab.test('parallel aggregate policy fails if one policy fails', function (done) {
+    lab.test('parallel aggregate policy fails if one policy fails', function () {
 
-        server.inject('/parallel-fails', function (res) {
+        return server.inject('/parallel-fails')
+            .then((res) => {
 
-            Code.expect(res.statusCode).to.equal(403);
-            Code.expect(res.result.error).to.equal('Forbidden');
-            done();
-        });
+                Code.expect(res.statusCode).to.equal(403);
+                Code.expect(res.result.error).to.equal('Forbidden');
+            });
     });
 
-    lab.test('parallel aggregate policy respects custom error responses', function (done) {
+    lab.test('parallel aggregate policy respects custom error responses', function () {
 
-        server.inject('/parallel-custom-error', function (res) {
+        return server.inject('/parallel-custom-error')
+            .then((res) => {
 
-            Code.expect(res.statusCode).to.equal(404);
-            done();
-        });
+                Code.expect(res.statusCode).to.equal(404);
+            });
     });
 
-    lab.test('parallel aggregate policy default error handler fails with error prioritized by listed policy order.', function (done) {
+    lab.test('parallel aggregate policy default error handler fails with error prioritized by listed policy order.', function () {
 
-        server.inject('/parallel-default-handler', function (res) {
+        return server.inject('/parallel-default-handler')
+            .then((res) => {
 
-            Code.expect(res.statusCode).to.equal(403);
-            Code.expect(res.result.message).to.equal('custom late');
-            done();
-        });
+                Code.expect(res.statusCode).to.equal(403);
+                Code.expect(res.result.message).to.equal('custom late');
+            });
     });
 
-    lab.test('parallel aggregate policy accepts custom error handler.', function (done) {
+    lab.test('parallel aggregate policy accepts custom error handler', function () {
 
-        server.inject('/parallel-custom-handler', function (res) {
+        return server.inject('/parallel-custom-handler')
+            .then((res) => {
 
-            Code.expect(res.statusCode).to.equal(403);
-            Code.expect(res.result.message).to.equal('custom and transformed');
-            done();
-        });
+                Code.expect(res.statusCode).to.equal(403);
+                Code.expect(res.result.message).to.equal('custom and transformed');
+            });
     });
 
-    lab.test('parallel aggregate policy runs multiple policies when specified in array format', function (done) {
+    lab.test('parallel aggregate policy runs multiple policies when specified in array format', function () {
 
-        server.inject('/parallel-as-array', function (res) {
+        return server.inject('/parallel-as-array')
+            .then((res) => {
 
-            Code.expect(res.statusCode).to.equal(200);
-            Code.expect(res.result.added).to.equal('this');
-            Code.expect(res.result.addedAnother).to.equal('that');
-            done();
-        });
+                Code.expect(res.statusCode).to.equal(200);
+                Code.expect(res.result.added).to.equal('this');
+                Code.expect(res.result.addedAnother).to.equal('that');
+            });
     });
 
-    lab.test('policy can be added programmatically', function (done) {
+    lab.test('policy can be added programmatically', function () {
 
         Code.expect(server.plugins.mrhorse.hasPolicy('yetAnotherPolicy')).to.equal(false);
 
-        server.plugins.mrhorse.addPolicy('yetAnotherPolicy', (request, reply, callback) => callback(null, true));
+        server.plugins.mrhorse.addPolicy('yetAnotherPolicy', async (request, h) => h.continue);
 
         Code.expect(server.plugins.mrhorse.hasPolicy('yetAnotherPolicy')).to.equal(true);
-        done();
     });
 
-    lab.test('hasPolicy returns false on non-existent policies', function (done) {
+    lab.test('hasPolicy returns false on non-existent policies', function () {
         Code.expect(server.plugins.mrhorse.hasPolicy('thisPolicyAbsolutelyDoesNotExist')).to.equal(false);
-        done();
     });
 
-    lab.test('orPolicy creates a chain of policies in which only one must succeed (left)', function (done) {
+    lab.test('orPolicy creates a chain of policies in which only one must succeed (left)', function () {
 
-        server.inject('/or-first-ok', function (res) {
+        return server.inject('/or-first-ok')
+            .then((res) => {
 
-            Code.expect(res.statusCode).to.equal(200);
-            done();
-        });
+                Code.expect(res.statusCode).to.equal(200);
+            });
     });
 
-    lab.test('orPolicy creates a chain of policies in which only one must succeed (right)', function (done) {
+    lab.test('orPolicy creates a chain of policies in which only one must succeed (right)', function () {
 
-        server.inject('/or-second-ok', function (res) {
+        return server.inject('/or-second-ok')
+            .then((res) => {
 
-            Code.expect(res.statusCode).to.equal(200);
-            done();
-        });
+                Code.expect(res.statusCode).to.equal(200);
+            });
     });
 
-    lab.test('orPolicy creates a chain of policies in which both may succeed', function (done) {
+    lab.test('orPolicy creates a chain of policies in which both may succeed', function () {
 
-        server.inject('/or-both-ok', function (res) {
+        return server.inject('/or-both-ok')
+            .then((res) => {
 
-            Code.expect(res.statusCode).to.equal(200);
-            done();
-        });
+                Code.expect(res.statusCode).to.equal(200);
+            });
     });
 
-    lab.test('orPolicy creates a chain of policies in which at least one must succeed', function (done) {
+    lab.test('orPolicy creates a chain of policies in which at least one must succeed', function () {
 
-        server.inject('/or-both-fail', function (res) {
+        return server.inject('/or-both-fail')
+            .then((res) => {
 
-            Code.expect(res.statusCode).to.equal(403);
-            done();
-        });
+                Code.expect(res.statusCode).to.equal(403);
+            });
     });
 
-    lab.test('programmatically added policy can be attached to a route', function (done) {
+    lab.test('programmatically added policy can be attached to a route', function () {
 
         const policyName = 'injectedPolicy';
-        var policyCalled = false;
+        let policyCalled = false;
 
         Code.expect(server.plugins.mrhorse.hasPolicy(policyName)).to.equal(false);
 
-        const policy = (request, reply, next) => {
+        const policy = async (request, h) => {
 
             policyCalled = true;
-            next( null, true );
+            return h.continue;
         };
 
         server.plugins.mrhorse.addPolicy(policyName, policy);
@@ -903,11 +884,11 @@ lab.experiment('Normal setup', function (done) {
         server.route({
             method : 'GET',
             path   : '/add-policy-test',
-            handler: function (request, reply) {
+            handler: async function () {
 
-                reply({
+                return {
                     handler: 'handler'
-                });
+                };
             },
             config : {
                 plugins: {
@@ -920,14 +901,24 @@ lab.experiment('Normal setup', function (done) {
 
         Code.expect(policyCalled).to.equal(false);
 
-        server.inject('/add-policy-test', function (res) {
+        return server.inject('/add-policy-test')
+            .then((res) => {
 
-            Code.expect(res.statusCode).to.equal(200);
-            Code.expect(policyCalled).to.equal(true);
-            done();
-        });
+                Code.expect(res.statusCode).to.equal(200);
+                Code.expect(policyCalled).to.equal(true);
+            });
 
     });
 
+
+    lab.test('can manage non-Error/non-Boom exceptions', function () {
+
+        return server.inject('/strange')
+            .then((res) => {
+
+                Code.expect(res.statusCode).to.equal(403);
+                Code.expect(res.result.message).to.equal('This is a weird thing to throw');
+            });
+    });
 
 });

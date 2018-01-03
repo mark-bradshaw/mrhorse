@@ -1,8 +1,8 @@
 'use strict';
 
-const incorrectApplyPoint = function (request, reply, callback) {
+const incorrectApplyPoint = function () {
 
-    callback(null, false, 'custom');
+    throw new Error('custom');
 };
 
 incorrectApplyPoint.applyPoint = 'onIncorrect'; // invalid hapi event name

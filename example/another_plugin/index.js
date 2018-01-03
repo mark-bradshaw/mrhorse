@@ -6,49 +6,43 @@ depends on Mr Horse.  You can see how that works below.
 */
 
 /* This will run after MrHorse is all loaded. */
-const after = function (server, next) {
+const after = async function (server, next) {
 
     /* all the main policies are available to us for these routes, but just
     for kicks we'll load our own logged in policy.  Just keep in mind, ALL
     plugins MUST be uniquely named.  We can't have a policy that is also
     named isLoggedIn, because that was already used in the main policy directory. */
-    server.plugins.mrhorse.loadPolicies(server, {
+    await server.plugins.mrhorse.loadPolicies(server, {
         policyDirectory: __dirname + '/policies'
-    }, (err) => {
+    });
 
-        if (err) {
-            console.log(err);
-        }
+    /*
+    Try http://localhost:3000/otherplugin, and
+    http://localhost:3000/otherplugin?loggedin=true
+    */
+    server.route({
+        method: 'GET',
+        path: '/otherplugin',
+        handler: function (request, h) {
 
-        /*
-        Try http://localhost:3000/otherplugin, and
-        http://localhost:3000/otherplugin?loggedin=true
-        */
-        server.route({
-            method: 'GET',
-            path: '/otherplugin',
-            handler: function (request, reply) {
-
-                reply('You are logged in to another plugin.');
-            },
-            config: {
-                plugins: {
-                    policies: ['apIsLoggedIn']
-                }
+            return('You are logged in to another plugin.');
+        },
+        config: {
+            plugins: {
+                policies: ['apIsLoggedIn']
             }
-        });
-
-        next();
+        }
     });
 };
 
-exports.register = function register(server, options, next) {
-
-    server.dependency('mrhorse', after);
-    next();
+exports.plugin = {
+    pkg: {
+        name: 'anotherPlugin',
+        version: '1.0.0'
+    }
 };
 
-exports.register.attributes = {
-    name: 'otherPlugin',
-    version: '1.0.0'
+exports.plugin.register = function register(server, options) {
+
+    server.dependency('mrhorse', after);
 };

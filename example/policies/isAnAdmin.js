@@ -1,14 +1,17 @@
 'use strict';
 
-const isAnAdmin = (request, reply, callback) => {
+const Boom = require('boom');
+
+const isAnAdmin = async (request, h) => {
 
     /* This is just for example purposes.  You would need your own logic here. */
     const admin = request.query.admin || false;
     console.log('admin', admin);
     if (!admin) {
-        return callback(null, false, 'You are not an admin');
+        throw Boom.forbidden('You are not an admin');
     }
-    callback(null, true);
+
+    return h.continue;
 };
 
 module.exports = isAnAdmin;

@@ -8,7 +8,7 @@ Lead Maintainer: [Mark Bradshaw](https://github.com/mark-bradshaw), [contributor
 
 ### What is it?
 
-This is inspired in part by policies in the sails.js project.  In sails policies are mostly used for authentication and authorization.  In hapi they can do just about anything.  Wouldn't it be nice to easily configure your routes for authentication by adding an 'isLoggedIn' tag?  Or before replying to a request checking to see if 'userHasAccessToWidget'?  Maybe you'd like to do some a/b testing, and want to change some requests to a different handler with 'splitAB'.  Or you'd like to add some special analytics tracking to some of your api requests, after your controller has already responded, with 'trackThisAtAWS'.  You create the policies and MrHorse applies them as directed, when directed.
+Wouldn't it be nice to easily configure your routes for authentication by adding an 'isLoggedIn' tag?  Or before replying to a request checking to see if 'userHasAccessToWidget'?  Maybe you'd like to do some a/b testing, and want to change some requests to a different handler with 'splitAB'.  Or you'd like to add some special analytics tracking to some of your api requests, after your controller has already responded, with 'trackThisAtAWS'.  You create the policies and MrHorse applies them as directed, when directed.
 
 MrHorse allows you to do all of these and more in a way that centralizes repeated code, and very visibly demonstrates what routes are doing.  You don't have to guess any more whether a route is performing an action.
 
@@ -17,7 +17,7 @@ It looks like this:
 server.route({
     method: 'GET',
     path: '/loggedin',
-    handler: function(request, reply) {},
+    handler: async function() {},
     config: {
         plugins: {
             policies: ['isLoggedIn', 'addTracking', 'logThis']
@@ -28,7 +28,7 @@ server.route({
 server.route({
     method: 'GET',
     path: '/admin',
-    handler: function(request, reply) {},
+    handler: async function() {},
     config: {
         plugins: {
             policies: [
@@ -44,7 +44,7 @@ server.route({
 
 Often your route handlers end up doing a lot of repeated work to collect data, check for user rights, tack on special data, and otherwise prepare to do the work of replying to a request.  It'd be very nice to keep the code that keeps getting repeated in a single location, and just apply it to routes declaratively. Often you end up repeating the same small bit of code across a lot of handlers to check for rights, or generate some tracking code, update a cookie, etc.  It's hard to see where these actions are happening across your site, code gets repeated, and updating that code to correct a bug can be tricky.
 
-[MrHorse](https://github.com/mark-bradshaw/mrhorse) let's you take those repeated bits of code and centralize them into  "policies", which are just single purpose javascript functions with the signature `function(request, reply, next)`.  Policies are a good fit whenever you find yourself repeating code in your handlers.  Policies can be used for authentication, authorization, reply modification and shaping, logging, or just about anything else you can imagine.  Policies can be applied at any point in the [Hapi request life cycle](http://hapijs.com/api#request-lifecycle), before authentication, before the request is processed, or even after a response has been created.  Once you've created a policy, you just apply it to whatever routes need it and let MrHorse take care of the rest.
+[MrHorse](https://github.com/mark-bradshaw/mrhorse) let's you take those repeated bits of code and centralize them into  "policies", which are just single purpose javascript functions with the signature `async function(request, h)`.  Policies are a good fit whenever you find yourself repeating code in your handlers.  Policies can be used for authentication, authorization, reply modification and shaping, logging, or just about anything else you can imagine.  Policies can be applied at any point in the [Hapi request life cycle](http://hapijs.com/api#request-lifecycle), before authentication, before the request is processed, or even after a response has been created.  Once you've created a policy, you just apply it to whatever routes need it and let MrHorse take care of the rest.
 
 Using policies you can easily mix and match your business logic into your routes in a declarative manner.  This makes it much easier to see what is being done on each route, and allows you to centralize your authentication, authorization, or logging in one place to DRY out your code.  If a policy decides that there's a problem with the current request it can immediately reply back with a 403 forbidden error, or the error of your choice.  You always have the option of doing a custom reply as well, and MrHorse will see that and step out of the way.
 
@@ -61,7 +61,7 @@ Hapi provides a somewhat similar mechanism for doing things before a route handl
 
 ### Examples
 
-Look in the `example` folder to see MrHorse in action.
+Look in the `example` folder to see MrHorse in action.  `node example/index.js`.
 
 
 ### Install
@@ -73,55 +73,40 @@ npm install mrhorse --save
 ```
 
 
-### Updating from v0.0.3
-Version 1.0.0 makes breaking changes from prior versions.  If you were using MrHorse prior to version 1.0.0, you should update your code as follows:
+### Updating
 
-* All the cases of the direct plugin initialisation should be updated from
+#### From 2.x
+Version 3.x contains breaking changes from 2.x. In particular, the Node callback model has been abandoned in favor of `async / await`.  This is a change in the entire Hapi ecosystem, so we are following their decision.  This also means that you must be running at least Node 8.
+
+The following functions are now `async` and do not accept a callback parameter any longer:
+
+* `server.plugins.mrhorse.loadPolicies`
+
+* Policies are now defined as `async` functions. If the function does not throw, it will be considered successful (and should return `h.continue`). In other words, policy definition should change from:
 ```javascript
-server.plugins.mrhorse.loadPolicies(server, __dirname + '/policies', function(err) {
-    ...
-    });
+function myPolicy(request, reply, next) {
+  if (isAdmin(request) === true ) {
+    return next(null, true);
+  }
+
+  return next(Boom.forbidden('Sorry')); // failure
+}
 ```
-to
+to:
 ```javascript
-server.plugins.mrhorse.loadPolicies(server, {
-        policyDirectory: __dirname + '/policies'
-    }, function(err) {
-    ...
-    });
-```
+async function myPolicy(request, h) {
+  if (isAdmin(request) === true) {
+    return h.continue; // success
+  }
 
-Going forward all options to loadPolicies function will be sent in a container object.
-
-* If you were using the ```post``` configuration option in your policy, like:
-```javascript
-var policy = function(request, reply, next) {
-   ... your policy code
-};
-
-// These are optional
-policy.post = true;
-
-module.exports = policy;
-```
-
-You should update it to:
-
-```javascript
-var policy = function(request, reply, next) {
-   ... your policy code
-};
-
-// These are optional
-policy.applyPoint = 'onPostHandler';
-
-module.exports = policy;
+  throw Boom.forbidden('Sorry'); // failure
+}
 ```
 
 
 ### Setup
 
-*Mrhorse* looks for policy files in a directory you create.  I recommend calling the directory `policies`, but you can choose any name you want.  You can have this directory sit anywhere in your hapi project structure.  If you are using plugins for different site functionality, each plugin can have its own, separate policies directory.
+*Mrhorse* looks for policy files in a directory you create.  I recommend calling the directory `policies`, but you can choose any name you want.  You can have this directory sit anywhere in your Hapi project structure.  If you are using plugins for different site functionality, each plugin can have its own, separate policies directory.
 
 Once you have created your policies directory you must tell MrHorse where it is.  You do this in two ways.  You can either pass the directory location in to the mrhorse plugin when you register it, like this:
 
@@ -131,9 +116,6 @@ server.register({
         options: {
             policyDirectory: __dirname + '/policies'
         }
-    },
-    function(err) {
-      ...
     });
 ```
 
@@ -142,12 +124,10 @@ Or you can provide a directory location using the `loadPolicies` function, like 
 ```javascript
 server.plugins.mrhorse.loadPolicies(server, {
         policyDirectory: __dirname + '/policies'
-    }, function(err) {
-    ...
     });
 ```
 
-Both strategies are fine, and can be complementary.  If your hapi project uses plugins to separate up functionality it is perfectly acceptable for each plugin to have its own `policies` folder.  Just use the `loadPolicies` function in each plugin.  See the example folder for additional detail.
+Both strategies are fine, and can be complementary.  If your Hapi project uses plugins to separate up functionality it is perfectly acceptable for each plugin to have its own `policies` folder.  Just use the `loadPolicies` function in each plugin.  See the example folder for additional detail.
 
 You can use MrHorse in as many places as you want.  It's ok to have multiple policies folders in different locations, and tell MrHorse to look in each one.  The only requirement is that each policy file name **must** be globally unique, since policies can be used on any route in any location.
 
@@ -162,25 +142,22 @@ server.register({
             policyDirectory: __dirname + '/policies'
             defaultApplyPoint: 'onPreHandler' /* optional.  Defaults to onPreHandler */,
         }
-    },
-    function(err) {
-      ...
     });
 ```
 
 
 #### Policies
 
-Now create a policy file inside the `policies` folder.  This is just a simple javascript file that exports one javascript function.  The name of the file should be the name you want to use for your policy.  MrHorse uses the file name, **not** the function name, to identify the policy so make sure you name the file appropriately.  If this policy file is named `isAdmin.js`, then the policy would be identified as `isAdmin`.
+Now create a policy file inside the `policies` folder.  This is just a simple javascript file that exports one `async` javascript function.  The name of the file should be the name you want to use for your policy.  MrHorse uses the file name, **not** the function name, to identify the policy so make sure you name the file appropriately.  If this policy file is named `isAdmin.js`, then the policy would be identified as `isAdmin`.
 
 ```javascript
-var isAdmin = function(request, reply, next) {
-   var role = _do_something_to_check_user_role(request);
+const isAdmin = async function(request, h) {
+   const role = _do_something_to_check_user_role(request);
    if (role && role === 'admin') {
-       return next(null, true); // All is well with this request.  Proceed to the next policy or the route handler.
-   } else {
-       return next(null, false); // This policy is not satisfied.  Return a 403 forbidden.
+       return h.continue; // All is well with this request.  Proceed to the next policy or the route handler.
    }
+
+   throw Boom.forbidden( 'Noo!' ); // This policy is not satisfied.  Return a 403 forbidden.
 };
 
 // This is optional.  It will default to 'onPreHandler' unless you use a different defaultApplyPoint.
@@ -189,13 +166,9 @@ isAdmin.applyPoint = 'onPreHandler';
 module.exports = isAdmin;
 ```
 
-The policy function **must** call the `next` callback and provide a boolean value indicating whether the request can continue on for further processing in the hapi lifecycle [`next(null, true)`].  If you don't call the `next` callback, hapi will **never** respond to the request.  It will timeout.
+On success, the policy function **must** return `h.continue`. In case of a failure, the policy function must throw an error.
 
-If you callback with false [`next(null, false)`] hapi will be sent a 403 forbidden error to reply with, by default.  Alternately you can provide your own error object to give a different type of response [`next(Boom.notFound(), false)`].
-
-You can also provide a custom message as a third parameter [`next(null, false, 'Custom message')`].  This will return back the default 403 forbidden error, but will include your message in the body.
-
-If your policy has nothing to do with authentication or authorization, you will just want to respond back with true to continue normal processing of the request [`next(null, true)`].
+Non-Boom errors are wrapped into a `Boom.forbidden` object automatically. The `error.message` field will be returned as part of the 403 error.
 
 By default all policies are assumed to be pre-handlers unless you specify otherwise.  You can, however, choose to run a policy at any point in the [Hapi request life cycle](http://hapijs.com/api#request-lifecycle) by specifying one of the event names that Hapi provides.  If you would like additional information about events that are called in the Hapi request life cycle, please refer to the [Hapi documentation](http://hapijs.com/api#request-lifecycle).
 
@@ -217,8 +190,8 @@ A single file can contain multiple policies, if it exports them in the exports o
 
 ```javascript
 module.exports = {
-    myPolicy1 : function(request, reply, next) { ... },
-    myPolicy2 : function(request, reply, next) { ... },
+    myPolicy1 : async function(request, h) { ... },
+    myPolicy2 : async function(request, h) { ... },
     ...
 };
 ```
@@ -227,7 +200,7 @@ module.exports = {
 #### Adding named policies programmatically
 
 ```javascript
-server.plugins.addPolicy('myPolicy1', function(request, reply, next) { ... });
+server.plugins.addPolicy('myPolicy1', async function(request, h) { ... });
 ```
 
 
@@ -243,7 +216,7 @@ server.plugins.hasPolicy('myPolicy'); // true | false
 Now that you've created your policy, apply it to whatever routes you want.
 
 ```javascript
-var routes = [
+const routes = [
    {
        method: 'your_method',
        path: '/your/path/here',
@@ -260,18 +233,18 @@ var routes = [
 
 In the `config.plugins.policies` array you can also include raw policy functions.
 ```javascript
-var isAdminPolicy = function isAdmin (request, reply, next) {
+const isAdminPolicy = async function isAdmin (request, h) {
 
     if (hasAdminAccess(request)) {
-        next(null, true);
-    } else {
-        next(null, false);
+        return h.continue;
     }
+
+    throw Boom.forbidden();
 };
 
 isAdminPolicy.applyPoint = 'onPreHandler';
 
-var routes = [
+const routes = [
    {
        method: 'your_method',
        path: '/your/path/here',
@@ -285,18 +258,18 @@ var routes = [
 ];
 ```
 
-This can be used with currying to great effect.
+This can be used with currying to great effect.  For instance, a `hasRole` function can be used with policies with a variety of different named roles without creating separate functions for each type of role.
+
 ```javascript
+const hasRole = function(roleName) {
 
-var hasRole = function(roleName) {
-
-    var hasSpecificRole = function hasSpecificRole (request, reply, next) {
+    const hasSpecificRole = async function hasSpecificRole (request, h) {
 
         if (hasRole(request, roleName)) {
-            next(null, true);
-        } else {
-            next(null, false);
+            return h.continue;
         }
+
+        throw Boom.forbidden();
     };
 
     hasSpecificRole.applyPoint = 'onPreHandler';
@@ -304,7 +277,7 @@ var hasRole = function(roleName) {
     return hasSpecificRole;
 };
 
-var routes = [
+const routes = [
    {
        method: 'your_method',
        path: '/your/path/here',
@@ -319,10 +292,10 @@ var routes = [
 ```
 
 ##### Running policies in parallel
-If you'd like to run policies in parallel, you can specify a list of loaded policies' names as an array or as individual arguments to `MrHorse.parallel`.  When policies are run in parallel, expect all policies to complete.  If any of the policies specify an error or `Forbidden 403` message, the error response from the left-most policy will be returned to the browser.
+If you'd like to run policies in parallel, you can specify a list of loaded policies' names as an array or as individual arguments to `MrHorse.parallel`.  When policies are run in parallel, expect all policies to complete.  If any of the policies throw an error, the error response from the left-most policy that was rejected will be returned to the browser.
 
 ```javascript
-var routes = [
+const routes = [
    {
        method: 'your_method',
        path: '/your/path/here',
@@ -340,9 +313,7 @@ var routes = [
 ```
 or equivalently,
 ```javascript
-var MrHorse = require('mrhorse');
-
-var routes = [
+const routes = [
    {
        method: 'your_method',
        path: '/your/path/here',
@@ -359,14 +330,14 @@ var routes = [
 ];
 ```
 
-`MrHorse.parallel` optionally accepts a custom error handler as its final argument.  This may be used to aggregate errors from multiple policies into a single custom error or message.  The signature of this function is `handler(ranPolicies, results, next)`.
+`MrHorse.parallel` optionally accepts a custom error handler as its final argument.  This may be used to aggregate errors from multiple policies into a single custom error or message.  The signature of this function is `handler(ranPolicies, results)`.
+
+If custom error handler is used, the custom error handler **must throw** in the cases it detects any reason to reject the policy. If the error handler function returns without throwing an error, the parallel policy will be considered satisfied.
 
  - `ranPolicies` is an array of the names of the policies that were run, with original listed order maintained.
  - `results` is an object whose keys are the names of the individual listed policies that ran, and whose values are objects of the format,
-   - `err:` a custom error passed to the pertinent policy's `next` callback.
-   - `canContinue:` the boolean value passed to the pertinent policy's `next` callback, deciding if the policy passed or failed.
-   - `message:` the custom error message passed to the pertinent policy's `next` callback, intended to become part of a `403 Forbidden` error.
- - `next(err, canContinue, message)` is the final callback for the aggregate policy.  This behaves the same as a standard policy's `next` callback, accepting a custom `err`, a `canContinue` boolean, and a custom `message` as arguments.
+   - `err:` the error thrown by the policy
+   - `status:` a field indicating whether the policy passed (`'ok'`) or not (`'error'`)
 
 
 ##### Conditional Policies
@@ -376,12 +347,12 @@ Normally all policies must be satisfied.
 MrHorse exposes `MrHorse.orPolicy()` function to provide an easy way to define a set of policies of which **at least one** must be satisfied.
 The tests are run in parallel. Error messages from unsatisfied policies are ignored, as long as at least one listed policy is satisfied.
 
-If all policies are unsatisfied, the request is rejected with the error message of the leftmost policy.
+If all policies are unsatisfied, the request is rejected with the error message of the left-most policy.
 
 ```javascript
-var MrHorse = require('mrhorse');
+const MrHorse = require('mrhorse');
 
-var routes = [
+const routes = [
    {
        method: 'your_method',
        path: '/your/path/here',
