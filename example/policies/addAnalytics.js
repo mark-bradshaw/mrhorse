@@ -1,11 +1,11 @@
 'use strict';
 
-const addAnalytics = (request, reply, callback) => {
+const addAnalytics = async (request, h) => {
 
     console.log('addAnalytics');
     request.response.source.analytics = 'this could be different for each request or user';
 
-    callback(null, true);
+    return h.continue;
 };
 
 addAnalytics.applyPoint = 'onPostHandler';

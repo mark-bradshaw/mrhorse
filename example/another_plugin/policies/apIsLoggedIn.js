@@ -1,11 +1,18 @@
 'use strict';
 
-const apIsLoggedIn = (request, reply, next) => {
+const Boom = require('boom');
+
+const apIsLoggedIn = async (request, h) => {
 
     /* This is just for example purposes.  You would need your own logic here. */
     const loggedIn = request.query.loggedin || false;
     console.log('apisloggedin', loggedIn);
-    next(null, loggedIn);
+
+    if (loggedIn) {
+        return h.continue;
+    }
+
+    throw Boom.forbidden();
 };
 
 module.exports = apIsLoggedIn;
