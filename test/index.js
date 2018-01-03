@@ -921,8 +921,4 @@ lab.experiment('Normal setup', function () {
             });
     });
 
-
-
-
-
 });

@@ -8,7 +8,7 @@ Lead Maintainer: [Mark Bradshaw](https://github.com/mark-bradshaw), [contributor
 
 ### What is it?
 
-This is inspired in part by policies in the sails.js project.  In sails policies are mostly used for authentication and authorization.  In hapi they can do just about anything.  Wouldn't it be nice to easily configure your routes for authentication by adding an 'isLoggedIn' tag?  Or before replying to a request checking to see if 'userHasAccessToWidget'?  Maybe you'd like to do some a/b testing, and want to change some requests to a different handler with 'splitAB'.  Or you'd like to add some special analytics tracking to some of your api requests, after your controller has already responded, with 'trackThisAtAWS'.  You create the policies and MrHorse applies them as directed, when directed.
+Wouldn't it be nice to easily configure your routes for authentication by adding an 'isLoggedIn' tag?  Or before replying to a request checking to see if 'userHasAccessToWidget'?  Maybe you'd like to do some a/b testing, and want to change some requests to a different handler with 'splitAB'.  Or you'd like to add some special analytics tracking to some of your api requests, after your controller has already responded, with 'trackThisAtAWS'.  You create the policies and MrHorse applies them as directed, when directed.
 
 MrHorse allows you to do all of these and more in a way that centralizes repeated code, and very visibly demonstrates what routes are doing.  You don't have to guess any more whether a route is performing an action.
 
@@ -17,7 +17,7 @@ It looks like this:
 server.route({
     method: 'GET',
     path: '/loggedin',
-    handler: function(request, reply) {},
+    handler: async function() {},
     config: {
         plugins: {
             policies: ['isLoggedIn', 'addTracking', 'logThis']
@@ -28,7 +28,7 @@ server.route({
 server.route({
     method: 'GET',
     path: '/admin',
-    handler: function(request, reply) {},
+    handler: async function() {},
     config: {
         plugins: {
             policies: [
@@ -61,7 +61,7 @@ Hapi provides a somewhat similar mechanism for doing things before a route handl
 
 ### Examples
 
-Look in the `example` folder to see MrHorse in action.
+Look in the `example` folder to see MrHorse in action.  `node example/index.js`.
 
 
 ### Install
@@ -76,7 +76,7 @@ npm install mrhorse --save
 ### Updating
 
 #### From 2.x
-Version 3.x contains breaking changes from 2.x. In particular, Node callback model has been abandoned in favor of `async / await`.
+Version 3.x contains breaking changes from 2.x. In particular, the Node callback model has been abandoned in favor of `async / await`.  This is a change in the entire Hapi ecosystem, so we are following their decision.  This also means that you must be running at least Node 8.
 
 The following functions are now `async` and do not accept a callback parameter any longer:
 
@@ -99,61 +99,14 @@ async function myPolicy(request, h) {
     return h.continue; // success
   }
 
-  throw Boom.forbidden('Sorry!'); // failure
+  throw Boom.forbidden('Sorry'); // failure
 }
-```
-
-
-
-#### From 0.0.3
-Version 1.0.0 makes breaking changes from prior versions.  If you were using MrHorse prior to version 1.0.0, you should update your code as follows:
-
-* All the cases of the direct plugin initialisation should be updated from
-```javascript
-server.plugins.mrhorse.loadPolicies(server, __dirname + '/policies', function(err) {
-    ...
-    });
-```
-to
-```javascript
-server.plugins.mrhorse.loadPolicies(server, {
-        policyDirectory: __dirname + '/policies'
-    }, function(err) {
-    ...
-    });
-```
-
-Going forward all options to loadPolicies function will be sent in a container object.
-
-* If you were using the ```post``` configuration option in your policy, like:
-```javascript
-var policy = async function(request, reply, next) {
-   ... your policy code
-};
-
-// These are optional
-policy.post = true;
-
-module.exports = policy;
-```
-
-You should update it to:
-
-```javascript
-var policy = function(request, reply, next) {
-   ... your policy code
-};
-
-// These are optional
-policy.applyPoint = 'onPostHandler';
-
-module.exports = policy;
 ```
 
 
 ### Setup
 
-*Mrhorse* looks for policy files in a directory you create.  I recommend calling the directory `policies`, but you can choose any name you want.  You can have this directory sit anywhere in your hapi project structure.  If you are using plugins for different site functionality, each plugin can have its own, separate policies directory.
+*Mrhorse* looks for policy files in a directory you create.  I recommend calling the directory `policies`, but you can choose any name you want.  You can have this directory sit anywhere in your Hapi project structure.  If you are using plugins for different site functionality, each plugin can have its own, separate policies directory.
 
 Once you have created your policies directory you must tell MrHorse where it is.  You do this in two ways.  You can either pass the directory location in to the mrhorse plugin when you register it, like this:
 
@@ -174,7 +127,7 @@ server.plugins.mrhorse.loadPolicies(server, {
     });
 ```
 
-Both strategies are fine, and can be complementary.  If your hapi project uses plugins to separate up functionality it is perfectly acceptable for each plugin to have its own `policies` folder.  Just use the `loadPolicies` function in each plugin.  See the example folder for additional detail.
+Both strategies are fine, and can be complementary.  If your Hapi project uses plugins to separate up functionality it is perfectly acceptable for each plugin to have its own `policies` folder.  Just use the `loadPolicies` function in each plugin.  See the example folder for additional detail.
 
 You can use MrHorse in as many places as you want.  It's ok to have multiple policies folders in different locations, and tell MrHorse to look in each one.  The only requirement is that each policy file name **must** be globally unique, since policies can be used on any route in any location.
 
@@ -202,9 +155,9 @@ const isAdmin = async function(request, h) {
    const role = _do_something_to_check_user_role(request);
    if (role && role === 'admin') {
        return h.continue; // All is well with this request.  Proceed to the next policy or the route handler.
-   } else {
-       throw Boom.forbidden( 'Noo!' ); // This policy is not satisfied.  Return a 403 forbidden.
    }
+
+   throw Boom.forbidden( 'Noo!' ); // This policy is not satisfied.  Return a 403 forbidden.
 };
 
 // This is optional.  It will default to 'onPreHandler' unless you use a different defaultApplyPoint.
@@ -247,7 +200,7 @@ module.exports = {
 #### Adding named policies programmatically
 
 ```javascript
-server.plugins.addPolicy('myPolicy1', function(request, h) { ... });
+server.plugins.addPolicy('myPolicy1', async function(request, h) { ... });
 ```
 
 
@@ -284,9 +237,9 @@ const isAdminPolicy = async function isAdmin (request, h) {
 
     if (hasAdminAccess(request)) {
         return h.continue;
-    } else {
-        throw Boom.forbidden();
     }
+
+    throw Boom.forbidden();
 };
 
 isAdminPolicy.applyPoint = 'onPreHandler';
@@ -305,18 +258,18 @@ const routes = [
 ];
 ```
 
-This can be used with currying to great effect.
-```javascript
+This can be used with currying to great effect.  For instance, a `hasRole` function can be used with policies with a variety of different named roles without creating separate functions for each type of role.
 
+```javascript
 const hasRole = function(roleName) {
 
     const hasSpecificRole = async function hasSpecificRole (request, h) {
 
         if (hasRole(request, roleName)) {
             return h.continue;
-        } else {
-            throw Boom.forbidden();
         }
+
+        throw Boom.forbidden();
     };
 
     hasSpecificRole.applyPoint = 'onPreHandler';

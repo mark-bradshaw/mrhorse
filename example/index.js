@@ -2,38 +2,31 @@
 
 const Hapi = require('hapi');
 
-const server = new Hapi.Server();
-server.connection({
-    port: 3000
-});
+const server = new Hapi.Server({ port: 3000 });
 
 /* Register the MrHorse Plugin, and feed it an initial list of policies */
 server.register(
     {
-        register: require('..'),
+        plugin: require('..'),
         options: {
             policyDirectory: __dirname + '/policies'
         }
-    },
-    (err) => {
+    }
+).catch((err) => {
 
-        if (err) {
-            return console.log(err);
-        }
-    });
+    return console.log(err);
+});
 
 /* Register another plugin to show how Mr Horse is used by other plugins. */
 server.register(
     {
-        register: require('./another_plugin'),
+        plugin: require('./another_plugin'),
         options: {}
-    },
-    (err) => {
+    }
+).catch((err) => {
 
-        if (err) {
-            return console.log(err);
-        }
-    });
+    return console.log(err);
+});
 
 /* Make a couple routes for example purposes. */
 server.route({
