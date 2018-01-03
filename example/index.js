@@ -3,6 +3,7 @@
 const Hapi = require('hapi');
 
 (async () => {
+
     const server = new Hapi.Server({ port: 3000 });
 
     /* Register the MrHorse Plugin, and feed it an initial list of policies */
@@ -29,7 +30,7 @@ const Hapi = require('hapi');
         path: '/',
         handler: function (request, h) {
 
-            return('MrHorse <a href="https://github.com/mark-bradshaw/mrhorse"></a>' +
+            return 'MrHorse <a href="https://github.com/mark-bradshaw/mrhorse"></a>' +
                 '<br />Try these:' +
                 '<br /><a href="/loggedin">http://localhost:3000/loggedin</a> - This will give a 403' +
                 '<br /><a href="/loggedin?loggedin=true">http://localhost:3000/loggedin?loggedin=true</a>' +
@@ -39,7 +40,7 @@ const Hapi = require('hapi');
                 '<br /><a href="/adminnight?loggedin=true&admin=true">http://localhost:3000/adminnight?loggedin=true&admin=true</a> - using parallel policies.  this might 403 depending on the phase of the moon.  seriously.' +
                 '<br /><a href="/addanalytics">http://localhost:3000/addanalytics</a> - Part of this JSON data is injected in a post handler' +
                 '<br /><a href="/otherplugin">http://localhost:3000/otherplugin</a> - This route comes from a plugin, which can also use Mr Horse.  This will give a 403.' +
-                '<br /><a href="/otherplugin?loggedin=true">http://localhost:3000/otherplugin?loggedin=true</a> - Here is that route, logged in');
+                '<br /><a href="/otherplugin?loggedin=true">http://localhost:3000/otherplugin?loggedin=true</a> - Here is that route, logged in';
         }
     });
 
@@ -52,7 +53,7 @@ const Hapi = require('hapi');
         path: '/loggedin',
         handler: function (request, h) {
 
-            return('You are logged in.');
+            return 'You are logged in.';
         },
         config: {
             plugins: {
@@ -71,7 +72,7 @@ const Hapi = require('hapi');
         path: '/admin',
         handler: function (request, h) {
 
-            return('You are logged in AND an admin.');
+            return 'You are logged in AND an admin.';
         },
         config: {
             plugins: {
@@ -88,9 +89,9 @@ const Hapi = require('hapi');
         path: '/addanalytics',
         handler: function (request, h) {
 
-            return({
+            return {
                 data: 'this could be cached'
-            });
+            };
         },
         config: {
             plugins: {
@@ -111,7 +112,7 @@ const Hapi = require('hapi');
         path: '/adminnight',
         handler: (request, h) => {
 
-            return('You are logged in AND an admin AND the moon is in phase.');
+            return 'You are logged in AND an admin AND the moon is in phase.';
         },
         config: {
             plugins: {

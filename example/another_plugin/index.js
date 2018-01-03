@@ -25,7 +25,7 @@ const after = async function (server, next) {
         path: '/otherplugin',
         handler: function (request, h) {
 
-            return('You are logged in to another plugin.');
+            return 'You are logged in to another plugin.';
         },
         config: {
             plugins: {

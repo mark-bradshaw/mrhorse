@@ -2,7 +2,7 @@
 
 const Boom = require('boom');
 
-const isAnAdmin = async (request, h) => {
+const isAnAdmin = (request, h) => {
 
     /* This is just for example purposes.  You would need your own logic here. */
     const admin = request.query.admin || false;

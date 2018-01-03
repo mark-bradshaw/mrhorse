@@ -2,7 +2,7 @@
 
 const Boom = require('boom');
 
-const isLoggedIn = async (request, h) => {
+const isLoggedIn = (request, h) => {
 
     /* This is just for example purposes.  You would need your own logic here. */
     const loggedIn = request.query.loggedin || false;
