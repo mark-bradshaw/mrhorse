@@ -136,8 +136,8 @@ Normally MrHorse would throw an error when it encounters a duplicate policy, and
 By default policies are applied at the `onPreHandler` event in the [Hapi request life cycle](http://hapijs.com/api#request-lifecycle) if no other event is specified in the policy.  Each policy can control which event to apply at.  You can also change the default event to whatever you want.  You would do this by passing in `defaultApplyPoint` in the options object when registering the plugin, like this:
 
 ```javascript
-server.register({
-        register: require('mrhorse'),
+await server.register({
+        plugin: require('mrhorse'),
         options: {
             policyDirectory: __dirname + '/policies'
             defaultApplyPoint: 'onPreHandler' /* optional.  Defaults to onPreHandler */,
