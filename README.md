@@ -18,7 +18,7 @@ server.route({
     method: 'GET',
     path: '/loggedin',
     handler: async function() {},
-    config: {
+    options: {
         plugins: {
             policies: ['isLoggedIn', 'addTracking', 'logThis']
         }
@@ -29,7 +29,7 @@ server.route({
     method: 'GET',
     path: '/admin',
     handler: async function() {},
-    config: {
+    options: {
         plugins: {
             policies: [
                 ['isLoggedIn', 'isAnAdmin'], // Do these two in parallel
@@ -111,12 +111,12 @@ async function myPolicy(request, h) {
 Once you have created your policies directory you must tell MrHorse where it is.  You do this in two ways.  You can either pass the directory location in to the mrhorse plugin when you register it, like this:
 
 ```javascript
-server.register({
-        register: require('mrhorse'),
-        options: {
-            policyDirectory: __dirname + '/policies'
-        }
-    });
+await server.register({
+    plugin: require('mrhorse'),
+    options: {
+        policyDirectory: __dirname + '/policies'
+    }
+});
 ```
 
 Or you can provide a directory location using the `loadPolicies` function, like this:
@@ -136,8 +136,8 @@ Normally MrHorse would throw an error when it encounters a duplicate policy, and
 By default policies are applied at the `onPreHandler` event in the [Hapi request life cycle](http://hapijs.com/api#request-lifecycle) if no other event is specified in the policy.  Each policy can control which event to apply at.  You can also change the default event to whatever you want.  You would do this by passing in `defaultApplyPoint` in the options object when registering the plugin, like this:
 
 ```javascript
-server.register({
-        register: require('mrhorse'),
+await server.register({
+        plugin: require('mrhorse'),
         options: {
             policyDirectory: __dirname + '/policies'
             defaultApplyPoint: 'onPreHandler' /* optional.  Defaults to onPreHandler */,
@@ -221,7 +221,7 @@ const routes = [
        method: 'your_method',
        path: '/your/path/here',
        handler: your_route_handler,
-       config: {
+       options: {
            plugins: {
                policies: ['isAdmin']
            }
@@ -249,7 +249,7 @@ const routes = [
        method: 'your_method',
        path: '/your/path/here',
        handler: your_route_handler,
-       config: {
+       options: {
            plugins: {
                policies: [ isAdminPolicy ]
            }
@@ -282,7 +282,7 @@ const routes = [
        method: 'your_method',
        path: '/your/path/here',
        handler: your_route_handler,
-       config: {
+       options: {
            plugins: {
                policies: [ hasRole('user') ]
            }
@@ -300,7 +300,7 @@ const routes = [
        method: 'your_method',
        path: '/your/path/here',
        handler: your_route_handler,
-       config: {
+       options: {
            plugins: {
                policies: [
                     'isFarmer',
@@ -318,7 +318,7 @@ const routes = [
        method: 'your_method',
        path: '/your/path/here',
        handler: your_route_handler,
-       config: {
+       options: {
            plugins: {
                policies: [
                     'isFarmer',
@@ -357,7 +357,7 @@ const routes = [
        method: 'your_method',
        path: '/your/path/here',
        handler: your_route_handler,
-       config: {
+       options: {
            plugins: {
                policies: [
                     'isAnimal', // must be satisfied
