@@ -1,6 +1,6 @@
 'use strict';
 
-const passes = function (request, h) {
+const passes = (request, h) => {
 
     return h.continue;
 };

@@ -229,6 +229,7 @@ const routes = [
    }
 ];
 ```
+
 ##### Specifying policies dynamically as functions
 
 In the `config.plugins.policies` array you can also include raw policy functions.
@@ -289,6 +290,22 @@ const routes = [
        }
    }
 ];
+```
+
+##### Running ONLY dynamic policies
+If you want to only assign policies dynamically by passing functions to the `policies` config option, this presents a small problem for MrHorse.  In order to not impact the efficiency of Hapi we only run our policy handlers on life cycle hooks when necessary, but due to the way dynamic policies are loaded, we can't determine which hooks are going to be needed ahead of time.
+
+If you want to only use dynamic policies, then you'll need to give MrHorse a bit of a clue, by manually telling it which life cycle hooks to watch for.  Yes, this *DOES* include the `onPreHandler` hook.  
+
+To provide the needed clue add the `watchApplyPoints` option to your plugin options, with an array of the apply points you will be using.
+
+```javascript
+await server.register({
+        plugin: require('mrhorse'),
+        options: {
+            watchApplyPoints: ['onPreHandler', 'onPostHandler']
+        }
+    });
 ```
 
 ##### Running policies in parallel
