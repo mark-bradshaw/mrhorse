@@ -4,8 +4,8 @@
     "description": "Apply policies to Hapi routes",
     "main": "lib/index",
     "scripts": {
-        "test": "lab -a @hapi/code -t 98 -L",
-        "coverage": "lab -a @hapi/code -t 98 -L -r html -o coverage.html"
+        "test": "lab -a @hapi/code -t 100 -L",
+        "coverage": "lab -a @hapi/code -t 100 -L -r html -o coverage.html"
     },
     "engines": {
         "node": ">=8.9.0"
