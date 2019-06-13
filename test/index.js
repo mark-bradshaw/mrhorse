@@ -1,10 +1,10 @@
 /* eslint-disable */
 
 const MrHorse = require('..');
-const Code = require('code');
+const Code = require('@hapi/code');
 const fs = require('fs');
-const Hapi = require('hapi');
-const Lab = require('lab');
+const Hapi = require('@hapi/hapi');
+const Lab = require('@hapi/lab');
 const lab = exports.lab = Lab.script();
 const util = require('util');
 
