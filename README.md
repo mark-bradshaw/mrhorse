@@ -40,7 +40,7 @@ server.route({
 });
 ```
 
-### Why use this
+### Why use this?
 
 Often your route handlers end up doing a lot of repeated work to collect data, check for user rights, tack on special data, and otherwise prepare to do the work of replying to a request.  It'd be very nice to keep the code that keeps getting repeated in a single location, and just apply it to routes declaratively. Often you end up repeating the same small bit of code across a lot of handlers to check for rights, or generate some tracking code, update a cookie, etc.  It's hard to see where these actions are happening across your site, code gets repeated, and updating that code to correct a bug can be tricky.
 
