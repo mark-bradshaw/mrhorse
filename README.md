@@ -8,7 +8,7 @@ Lead Maintainer: [Mark Bradshaw](https://github.com/mark-bradshaw), [contributor
 
 ### What is it?
 
-Wouldn't it be nice to easily configure your routes for authentication by adding an 'isLoggedIn' tag?  Or before replying to a request checking to see if 'userHasAccessToWidget'?  Maybe you'd like to do some a/b testing, and want to change some requests to a different handler with 'splitAB'.  Or you'd like to add some special analytics tracking to some of your api requests, after your controller has already responded, with 'trackThisAtAWS'.  You create the policies and MrHorse applies them as directed, when directed.
+Wouldn't it be nice to easily configure your routes for authentication by adding an `isLoggedIn` tag?  Or before replying to a request checking to see if `userHasAccessToWidget`?  Maybe you'd like to do some a/b testing, and want to change some requests to a different handler with `splitAB`.  Or you'd like to add some special analytics tracking to some of your api requests, after your controller has already responded, with `trackThisAtAWS`.  You create the policies and MrHorse applies them as directed, when directed.
 
 MrHorse allows you to do all of these and more in a way that centralizes repeated code, and very visibly demonstrates what routes are doing.  You don't have to guess any more whether a route is performing an action.
 
@@ -71,6 +71,8 @@ To install mrhorse:
 ```
 npm install mrhorse --save
 ```
+
+Requires Node 10.
 
 
 ### Updating
