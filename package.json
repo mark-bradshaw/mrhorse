@@ -4,11 +4,12 @@
     "description": "Apply policies to Hapi routes",
     "main": "lib/index",
     "scripts": {
+        "examples": "node example/index.js",
         "test": "lab -a @hapi/code -t 100 -L",
         "coverage": "lab -a @hapi/code -t 100 -L -r html -o coverage.html"
     },
     "engines": {
-        "node": ">=8.9.0"
+        "node": ">=10.0.0"
     },
     "repository": {
         "type": "git",
@@ -25,14 +26,14 @@
     },
     "homepage": "https://github.com/mark-bradshaw/mrhorse",
     "dependencies": {
-        "@hapi/boom": "^8.0.1",
-        "@hapi/hoek": "^8.5.0",
+        "@hapi/boom": "^9.0.0",
+        "@hapi/hoek": "^9.0.0",
         "lodash": "^4.17.15"
     },
     "devDependencies": {
-        "@hapi/code": "^7.0.0",
+        "@hapi/code": "^8.0.1",
         "@hapi/hapi": "^18.4.0",
-        "@hapi/lab": "^21.0.0",
-        "@hapi/wreck": "^16.0.1"
+        "@hapi/lab": "^22.0.3",
+        "@hapi/wreck": "^17.0.0"
     }
 }
