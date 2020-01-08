@@ -25,14 +25,14 @@
     },
     "homepage": "https://github.com/mark-bradshaw/mrhorse",
     "dependencies": {
-        "@hapi/boom": "7.x.x",
-        "@hapi/hoek": "7.x.x",
+        "@hapi/boom": "^8.0.1",
+        "@hapi/hoek": "^8.5.0",
         "lodash": "^4.17.15"
     },
     "devDependencies": {
-        "@hapi/code": "5.x.x",
+        "@hapi/code": "^7.0.0",
         "@hapi/hapi": "^18.4.0",
-        "@hapi/lab": "19.x.x",
-        "@hapi/wreck": "15.x.x"
+        "@hapi/lab": "^21.0.0",
+        "@hapi/wreck": "^16.0.1"
     }
 }
