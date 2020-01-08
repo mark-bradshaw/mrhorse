@@ -72,7 +72,7 @@ To install mrhorse:
 npm install mrhorse --save
 ```
 
-Requires Node 10.
+Requires Node >= 10.
 
 
 ### Updating
