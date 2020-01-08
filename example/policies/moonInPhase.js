@@ -1,7 +1,7 @@
 'use strict';
 
-const Wreck = require('wreck');
-const Boom = require('boom');
+const Wreck = require('@hapi/wreck');
+const Boom = require('@hapi/boom');
 
 const moonInPhase = async (request, h) => {
 
