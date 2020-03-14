@@ -9,7 +9,7 @@
         "coverage": "lab -a @hapi/code -t 100 -L -r html -o coverage.html"
     },
     "engines": {
-        "node": ">=10.0.0"
+        "node": ">=12.0.0"
     },
     "repository": {
         "type": "git",
@@ -32,7 +32,7 @@
     },
     "devDependencies": {
         "@hapi/code": "^8.0.1",
-        "@hapi/hapi": "^18.4.1",
+        "@hapi/hapi": "^19.0.1",
         "@hapi/lab": "^22.0.4",
         "@hapi/wreck": "^17.0.0"
     }
