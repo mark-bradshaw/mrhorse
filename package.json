@@ -5,7 +5,7 @@
     "main": "lib/index",
     "scripts": {
         "examples": "node example/index.js",
-        "test": "lab -a @hapi/code -t 100 -L",
+        "test": "lab -a @hapi/code -t 100 -L -l",
         "coverage": "lab -a @hapi/code -t 100 -L -r html -o coverage.html"
     },
     "engines": {
