@@ -13,7 +13,7 @@ const after = async function (server, next) {
     plugins MUST be uniquely named.  We can't have a policy that is also
     named isLoggedIn, because that was already used in the main policy directory. */
     await server.plugins.mrhorse.loadPolicies(server, {
-        policyDirectory: __dirname + '/policies'
+        policyDirectory: `${__dirname}/policies`
     });
 
     /*

@@ -70,7 +70,7 @@ To install mrhorse:
 npm install mrhorse --save
 ```
 
-Requires Node >= 12.  If you require an older version of node you'll need to use version 5 of MrHorse.  The functionality is the same.
+Requires Node >= 14, following the baseline requirements of hapi v21.
 
 ### Updating
 

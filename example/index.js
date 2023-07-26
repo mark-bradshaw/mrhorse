@@ -11,7 +11,7 @@ const Hapi = require('@hapi/hapi');
         {
             plugin: require('..'),
             options: {
-                policyDirectory: __dirname + '/policies'
+                policyDirectory: `${__dirname}/policies`
             }
         }
     );
@@ -28,7 +28,7 @@ const Hapi = require('@hapi/hapi');
     server.route({
         method: 'GET',
         path: '/',
-        handler: function (request, h) {
+        handler: function () {
 
             return 'MrHorse <a href="https://github.com/mark-bradshaw/mrhorse"></a>' +
                 '<br />Try these:' +
@@ -51,7 +51,7 @@ const Hapi = require('@hapi/hapi');
     server.route({
         method: 'GET',
         path: '/loggedin',
-        handler: function (request, h) {
+        handler: function () {
 
             return 'You are logged in.';
         },
@@ -70,7 +70,7 @@ const Hapi = require('@hapi/hapi');
     server.route({
         method: 'GET',
         path: '/admin',
-        handler: function (request, h) {
+        handler: function () {
 
             return 'You are logged in AND an admin.';
         },
@@ -87,7 +87,7 @@ const Hapi = require('@hapi/hapi');
     server.route({
         method: 'GET',
         path: '/addanalytics',
-        handler: function (request, h) {
+        handler: function () {
 
             return {
                 data: 'this could be cached'
