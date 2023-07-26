@@ -13,6 +13,7 @@ Wouldn't it be nice to easily configure your routes for authentication by adding
 MrHorse allows you to do all of these and more in a way that centralizes repeated code, and very visibly demonstrates what routes are doing.  You don't have to guess any more whether a route is performing an action.
 
 It looks like this:
+
 ```javascript
 server.route({
     method: 'GET',
@@ -48,7 +49,6 @@ Often your route handlers end up doing a lot of repeated work to collect data, c
 
 Using policies you can easily mix and match your business logic into your routes in a declarative manner.  This makes it much easier to see what is being done on each route, and allows you to centralize your authentication, authorization, or logging in one place to DRY out your code.  If a policy decides that there's a problem with the current request it can immediately reply back with a 403 forbidden error, or the error of your choice.  You always have the option of doing a custom reply as well, and MrHorse will see that and step out of the way.
 
-
 ### Why use MrHorse instead of Hapi route prerequisites
 
 Hapi provides a somewhat similar mechanism for doing things before a route handler is executed, called route prerequisites.  MrHorse seems to be overlapping this functionality, so why not just use prerequisites?
@@ -58,11 +58,9 @@ Hapi provides a somewhat similar mechanism for doing things before a route handl
 1. MrHorse helps you to keep your policy type code in a central location, and loads it up for you.  Prerequisites don't provide any help with this.
 1. MrHorse can allow policies to run at even more places in the [Hapi request life cycle](http://hapijs.com/api#request-lifecycle) than just right before the handler.  This is a flexibility that prerequisites probably will never have.
 
-
 ### Examples
 
 Look in the `example` folder to see MrHorse in action.  `node example/index.js`.
-
 
 ### Install
 
@@ -74,10 +72,10 @@ npm install mrhorse --save
 
 Requires Node >= 12.  If you require an older version of node you'll need to use version 5 of MrHorse.  The functionality is the same.
 
-
 ### Updating
 
 #### From 2.x
+
 Version 3.x contains breaking changes from 2.x. In particular, the Node callback model has been abandoned in favor of `async / await`.  This is a change in the entire Hapi ecosystem, so we are following their decision.  This also means that you must be running at least Node 8.
 
 The following functions are now `async` and do not accept a callback parameter any longer:
@@ -85,6 +83,7 @@ The following functions are now `async` and do not accept a callback parameter a
 * `server.plugins.mrhorse.loadPolicies`
 
 * Policies are now defined as `async` functions. If the function does not throw, it will be considered successful (and should return `h.continue`). In other words, policy definition should change from:
+
 ```javascript
 function myPolicy(request, reply, next) {
   if (isAdmin(request) === true ) {
@@ -94,7 +93,9 @@ function myPolicy(request, reply, next) {
   return next(Boom.forbidden('Sorry')); // failure
 }
 ```
+
 to:
+
 ```javascript
 async function myPolicy(request, h) {
   if (isAdmin(request) === true) {
@@ -104,7 +105,6 @@ async function myPolicy(request, h) {
   throw Boom.forbidden('Sorry'); // failure
 }
 ```
-
 
 ### Setup
 
@@ -116,7 +116,7 @@ Once you have created your policies directory you must tell MrHorse where it is.
 await server.register({
     plugin: require('mrhorse'),
     options: {
-        policyDirectory: __dirname + '/policies'
+        policyDirectory: `${__dirname}/policies`
     }
 });
 ```
@@ -125,7 +125,7 @@ Or you can provide a directory location using the `loadPolicies` function, like 
 
 ```javascript
 server.plugins.mrhorse.loadPolicies(server, {
-        policyDirectory: __dirname + '/policies'
+        policyDirectory: `${__dirname}/policies`
     });
 ```
 
@@ -141,12 +141,11 @@ By default policies are applied at the `onPreHandler` event in the [Hapi request
 await server.register({
         plugin: require('mrhorse'),
         options: {
-            policyDirectory: __dirname + '/policies'
+            policyDirectory: `${__dirname}/policies`
             defaultApplyPoint: 'onPreHandler' /* optional.  Defaults to onPreHandler */,
         }
     });
 ```
-
 
 #### Policies
 
@@ -185,7 +184,6 @@ The events in the life cycle are:
 
 Post handlers can alter the response created by the response handler before it gets sent.  This is useful if you want to add additional data to the response before it goes out on the wire.  The response can be found in `request.response.source`, **only** after the request handler has run.  Before that time there is no response object.
 
-
 #### Loading many policies from a file
 
 A single file can contain multiple policies, if it exports them in the exports object.
@@ -198,20 +196,17 @@ module.exports = {
 };
 ```
 
-
 #### Adding named policies programmatically
 
 ```javascript
 server.plugins.addPolicy('myPolicy1', async function(request, h) { ... });
 ```
 
-
 #### Check if policy exists
 
 ```javascript
 server.plugins.hasPolicy('myPolicy'); // true | false
 ```
-
 
 #### Apply to routes
 
@@ -235,6 +230,7 @@ const routes = [
 ##### Specifying policies dynamically as functions
 
 In the `config.plugins.policies` array you can also include raw policy functions.
+
 ```javascript
 const isAdminPolicy = async function isAdmin (request, h) {
 
@@ -295,6 +291,7 @@ const routes = [
 ```
 
 ##### Running ONLY dynamic policies
+
 If you want to only assign policies dynamically by passing functions to the `policies` config option, this presents a small problem for MrHorse.  In order to not impact the efficiency of Hapi we only run our policy handlers on life cycle hooks when necessary, but due to the way dynamic policies are loaded, we can't determine which hooks are going to be needed ahead of time.
 
 If you want to only use dynamic policies, then you'll need to give MrHorse a bit of a clue, by manually telling it which life cycle hooks to watch for.  Yes, this *DOES* include the `onPreHandler` hook.
@@ -311,6 +308,7 @@ await server.register({
 ```
 
 ##### Running policies in parallel
+
 If you'd like to run policies in parallel, you can specify a list of loaded policies' names as an array or as individual arguments to `MrHorse.parallel`.  When policies are run in parallel, expect all policies to complete.  If any of the policies throw an error, the error response from the left-most policy that was rejected will be returned to the browser.
 
 ```javascript
@@ -330,7 +328,9 @@ const routes = [
    }
 ];
 ```
+
 or equivalently,
+
 ```javascript
 const routes = [
    {
@@ -353,11 +353,10 @@ const routes = [
 
 If custom error handler is used, the custom error handler **must throw** in the cases it detects any reason to reject the policy. If the error handler function returns without throwing an error, the parallel policy will be considered satisfied.
 
- - `ranPolicies` is an array of the names of the policies that were run, with original listed order maintained.
- - `results` is an object whose keys are the names of the individual listed policies that ran, and whose values are objects of the format,
-   - `err:` the error thrown by the policy
-   - `status:` a field indicating whether the policy passed (`'ok'`) or not (`'error'`)
-
+* `ranPolicies` is an array of the names of the policies that were run, with original listed order maintained.
+* `results` is an object whose keys are the names of the individual listed policies that ran, and whose values are objects of the format,
+  * `err:` the error thrown by the policy
+  * `status:` a field indicating whether the policy passed (`'ok'`) or not (`'error'`)
 
 ##### Conditional Policies
 
